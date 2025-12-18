@@ -9,20 +9,12 @@ export const searchProducts = (keyWord) => axiosClient.get(`/products/search?key
 
 // export const filterProductsByCategory = (categoryId) => axiosClient.get(`/products/category/${categoryId}`);
 
-export const updateProduct = (id, formData) => axiosClient.put(`/product/${id}`, formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        }
-      }
-);
+export const createProduct = (formData) =>
+  axiosClient.post("/products", formData);
 
-export const createProduct =(formData) => axiosClient.post('/products', formData,
-      {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        }
-    });
+export const updateProduct = (id, formData) =>
+  axiosClient.put(`/product/${id}`, formData);
+
 
 export const deleteProduct = (id) => axiosClient.delete(`/product/${id}`);
 
