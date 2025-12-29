@@ -1,0 +1,48 @@
+.navbar-div {
+  border-bottom: 1px solid #eee;
+  position: relative;
+  display: flex;
+  background: #ffff;
+  align-items: center;
+  height: min-content;
+  gap: 5%;
+  height: 100px;
+  justify-content: space-around;
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+  padding: 1rem;
+  width: 100%;
+}
+
+.nav-img {
+  padding: 0.5rem;
+}
+select {
+  background-color: transparent;
+  padding: 1rem;
+  border: none;
+}
+.nav-search-field {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.5rem;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.nav-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  width: 20%;
+}
+
+.search-field input {
+  position: absolute;
+  padding: 1rem;
+  width: 200px;
+  height: 1px;
+  right: 23vw;
+}

@@ -1,0 +1,34 @@
+.footer-div{
+    width: 100%;
+    padding: 1rem;
+    height: min-content;
+    background: #6b1d4d;
+}
+
+.footer-cont{
+    width: 100%;
+    /* gap: 0.5rem; */
+    display: flex;
+    background-color: transparent;
+    color: white;
+    font-size: 15px;
+    justify-content: space-around;
+    align-items:last baseline;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+.footer-social{
+    display: flex;
+    font-size: 30px;
+    gap: 1rem;
+}
+.copy-div{
+    display: flex;
+    align-items: center;
+    color:white;
+    padding-left: 6rem;
+}
+.separator{
+    height: 6rem;
+    width: 1px;
+    background: #756767;
+}

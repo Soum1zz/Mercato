@@ -1,0 +1,74 @@
+.hero-div {
+  height: min-content;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  /* width: 95vw; */
+}
+.hero-content{
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    height: min-content;
+    width: 500px;
+    top:10vh;
+    left: 10vh;
+    padding: 2rem;
+    position: absolute;
+    background: #ffffff;
+    border-radius: 10px;
+}
+
+
+.hero-img {
+  height: 700px;
+  width: 100%;
+  background-image: url(../assets/frank-hero.webp);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  /* overflow: hidden; */
+}
+
+.hero-txt {
+
+  font-size: 5rem;
+  color: rgb(100, 14, 72);
+  font-weight: 800;
+}
+.hero-sub-txt{
+    font-size: 25px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+.hero-btn {
+  cursor: pointer;
+
+  width: 200px;
+  padding: 1rem;
+  font-size: 30px;
+  background-color: transparent;
+  background: #6b1d4d;
+  color: white;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 6px;
+}
+.hero-footer{
+  display: flex;
+  align-items: center;
+  justify-content:space-around;
+  gap: 1rem;
+  padding: 9rem;
+}
+.hero-footer-img{
+  width: 90px;
+}
+.hero-sub-footer{
+  display: flex;
+  align-items: center;
+  font-size: 20px;
+  font-weight: 600;
+  color: rgba(39, 36, 36, 0.76);
+  gap: 1rem;
+  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}

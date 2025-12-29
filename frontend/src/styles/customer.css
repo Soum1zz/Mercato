@@ -1,0 +1,102 @@
+.customer-div{
+    padding: 5rem;
+    display: flex;
+    justify-content:space-around;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 25px;
+    color: rgba(60, 61, 61, 0.877);
+}
+.nav-sub-cat{
+    padding: 0.3rem;
+    height: 60px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+}
+.nav-sub-cat.active{
+    background: #6b1d4d;
+    color: white;
+}
+.customer-nav{
+    padding: 3rem;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    height: 70vh;
+    width: 15vw;
+}
+
+.customer-img{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.customer-img img{
+    width: 8rem;
+    height: 8rem;
+    border-radius: 50%;
+    background: #6b1d4d5b;
+}
+
+.prof-sub-div{
+    width: 55vw;
+    padding: 3rem;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    height: min-content;
+
+}
+.customer-right{
+    /* width: 80%; */
+    padding: 2rem;
+    display: flex;
+    gap: 2rem;
+    flex-direction: column;
+    align-items: flex-start;
+    /* justify-content: center; */
+}
+
+.auth-div form input:focus{
+    outline: none;
+    border: 1px solid #6b1d4d;
+    box-shadow: 0 0 0 3px rgba(107, 29, 77, 0.15);
+}
+.customer-right-fields{
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between; 
+    align-items: center; 
+    align-self: flex-end;
+
+}
+.customer-right-fields label{
+    flex: 0 0 200px;
+    /* text-align: left;  */
+
+}
+.customer-right input{
+    flex: 1;
+    background: #f5f5f5;
+    padding: 1rem;
+    width: 500px;
+    text-align: center;
+    border: none;
+    border-radius: 10px;
+}
+.prof-btn{
+    transform: translateX(200%);
+    width:200px;
+    padding: 1rem;
+    color: aliceblue;
+    background: #6b1d4d;
+    border-radius: 5px;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+.prof-btn:hover{
+    
+    background: #5a173f;
+    transform: translateX(1px) translatey(1px);
+    box-shadow: 3px 3px gray;
+}

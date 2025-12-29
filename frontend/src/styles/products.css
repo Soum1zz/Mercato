@@ -1,0 +1,8 @@
+.prods-div{
+    margin: 0 auto;
+    display: flex;
+    justify-items: center;
+    align-items: center;
+    gap: 1rem;
+    transform: translateX(10%);
+}

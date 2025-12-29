@@ -1,0 +1,32 @@
+.about-div{
+    height: min-content;
+    padding: 5rem;
+    display: flex;
+    justify-content: space-around;
+    gap: 2rem;
+    margin-bottom: 4rem;
+}
+.reveal{
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.8s ease-out;
+}
+.reveal.active{
+    opacity: 1;
+    transform: translateY(0);
+}
+.about-img{
+    width: 700px;
+    border-radius: 10px;
+}
+.about-info{
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 25px;
+    color: rgba(39, 36, 36, 0.76);
+    /* font-weight: 100; */
+
+}
+
+.about-info p{
+    line-height: 1.8;
+}

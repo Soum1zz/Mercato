@@ -2,6 +2,8 @@ body{
     margin: 0;
     padding: 0;
     overflow-x: hidden;
+    background-color: white;
+
     
     /* overflow-y: hidden; */
 }
@@ -10,7 +12,6 @@ body{
 
     width: 100vw;
     min-height: 100vh;
-    background-color: #7091b3;
     color: #111827;
     /* transform: translateX(5%); */
 
