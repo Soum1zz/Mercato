@@ -1,8 +1,44 @@
 .prods-div{
-    margin: 0 auto;
+    padding: 5rem;
     display: flex;
-    justify-items: center;
+    justify-content:space-around;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 25px;
+    color: rgba(60, 61, 61, 0.877);
+}
+.prods-nav{
+    padding: 3rem;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    height: min-content;
+    width: 15vw;
+    font-size: 20px;
+
+}
+.prod-nav-sub-cat{
+    padding: 0.5rem;
+    margin: 0.5rem;
+    height: 60px;
+    border-radius: 10px;
+    display: flex;
     align-items: center;
-    gap: 1rem;
-    transform: translateX(10%);
+    /* gap: 0.5rem; */
+    cursor: pointer;
+}
+.prod-nav-sub-cat.active{
+    background: #6b1d4d;
+    color: white;
+}
+.prod-right{
+    height: min-content;
+    width: 65vw;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    padding: 2rem;
+}
+.all-prods{
+    padding: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    align-items: center;
+    
 }

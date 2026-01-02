@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import {BrowserRouter, Routes, Route, useLocation} from "react-router-dom"
 import './App.css'
 import Navbar from './components/Navbar'
@@ -13,14 +13,21 @@ function App() {
   const [theme, setTheme]=  useState ("light");
   const[products, setProducts]= useState([]);
   const noNavbar= ['/auth'];
-
-  const location= useLocation();
+  const aboutRef=useRef(null);
+  const contactRef=useRef(null);
   return (
     <div className={`wrapper ${theme==="light"? "":" active"}`}>
-       {!noNavbar.includes(location.pathname) &&<  Navbar theme={theme} setTheme={setTheme} setProducts={setProducts}/>}
+       {!noNavbar.includes(location.pathname) &&<  Navbar 
+
+        scrollToAbout={()=>aboutRef.current?.scrollIntoView({ behavior:"smooth"})}
+        scrollToContact={()=>contactRef.current?.scrollIntoView({ behavior:"smooth"})}
+
+
+       theme={theme} setTheme={setTheme} setProducts={setProducts}/>}
 
         <Routes>
-          <Route path='/' element={<Home products={products}/>} />
+          <Route path='/' element={<Home products={products} aboutRef={aboutRef}
+          contactRef={contactRef}/>} />
           <Route path='/cart' element={<Cart />} />
           <Route path='/auth' element={<Authenticate />} />
           <Route path='/productForm' element={<ProductForm />} />

@@ -97,6 +97,5 @@
 .prof-btn:hover{
     
     background: #5a173f;
-    transform: translateX(1px) translatey(1px);
     box-shadow: 3px 3px gray;
 }

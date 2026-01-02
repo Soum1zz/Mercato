@@ -34,7 +34,7 @@ return(
           <div className="prof-sub-div">
               {content ==="CustomerForm"&& <CustomerForm />}
               {content ==="Wishlist"&&<Wishlist/>}
-              {content ==="Profile"&&<Orders />}
+              {content ==="Orders"&&<Orders />}
           </div>
     </div>
 )

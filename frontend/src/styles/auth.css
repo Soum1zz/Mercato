@@ -38,13 +38,13 @@
     align-items: flex-start;
     gap: 25px;
 }
-.auth-div form label {
+.auth-div form label:not(.auth-radio) {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
 }
-.auth-div form input {
+.auth-div form input:not([type="radio"]) {
     background: #f5f5f5;
     padding: 1rem;
     width: 300px;
@@ -52,10 +52,27 @@
     border: none;
     border-radius: 10px;
 }
-.auth-div form input:focus{
+.auth-div form input:not([type="radio"]):focus{
     outline: none;
     border: 1px solid #6b1d4d;
     box-shadow: 0 0 0 3px rgba(107, 29, 77, 0.15);
+
+}
+.radio-btn{
+    display: flex;
+    gap: 1rem;
+    flex-direction: column;
+}
+.auth-radio{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1rem;
+    width: auto;
+}
+.auth-radio input[type="radio"]{
+    margin: 0;
+    transform: scale(1.5);
 }
 .auth-btn{
     width:200px;

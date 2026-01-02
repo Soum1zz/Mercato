@@ -1,64 +1,58 @@
+
+
+
 import "../styles/Navbar.css"
 import { IoMdSearch } from "react-icons/io";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { IoCart } from "react-icons/io5";
 import cart from '../assets/cart-no-notif.png'
 import cartNotif from '../assets/cart-yes-notif.png'
 import profile from '../assets/black-icon.png'
 
-export default function Navbar({theme, setTheme, setProducts}){
+export default function Navbar({ setProducts, scrollToAbout, scrollToContact}){
     const navigate= useNavigate();
     const[clicked, setClicked]= useState(false)
-    const categories=[
-        "All Products",
-        "Electronics", "Fashion", "Home & Living", 
-        "Beauty & Personal Care", "Books"
-    ];
-    // const categoryHandler=async(category="All Products")=>{
-    //                 let url= "http://localhost:8080/api/products";
-                    
-    //                 if(category!=="All Products"){
-    //                     url=`http://localhost:8080/api/products/${category}`;
-    //                 }
- 
 
-    //                 try{
-    //                 const fetchProduct= await fetch(url);
-    //                 if(fetchProduct.ok){
-    //                 const data= await fetchProduct.json();
-    //                 setProducts(data);}
-    //                 }catch(e){
-    //                     console.error("Failed to fetch the products:", e);
-    //                 }
-                    
-    //           }
-    // useEffect(()=>{
-    //     categoryHandler();
-    // },[]);
+    const location= useLocation();
+    const handleNavigation= (type)=>{
+        if(location.pathname !== "/"){
+             navigate("/",{
+                state: {scrollTo: type}
+             });
+        } else{
+            type === "about"? scrollToAbout():scrollToContact();
+        }
+    };
+
+
+
     return (
         <div className="navbar-div">
 
             <div
-            style={{fontSize:"45px",fontWeight:"bolder"}}
-             className="brand-name">
+            style={{fontSize:"45px",fontWeight:"bolder", cursor: "pointer"}}
+             className="brand-name"
+             onClick={()=>navigate("/")}
+
+             >
                 Mercato
             </div>
             <div className="nav-search-field">
-                <div>Home</div>
-                <select 
-                style={{width:"160px", fontSize:"20px"}}
-                 defaultValue="All Products" 
-                onChange={(e)=>categoryHandler(e.target.value)}
-                >
-                {
-                    categories.map((cat)=>(
-                        <option key={cat} value={cat}>{cat}</option>
-                    ))
-                }
-              </select>
-                <div>About Us</div>
-                <div>Contact Us</div>
+                <div
+             onClick={()=>navigate("/")}
+             style={{cursor:"pointer"}}
+                >Home</div>
+                <div
+             onClick={()=>navigate("/products")}
+             style={{cursor:"pointer"}}
+                >Products</div>
+                <div
+                onClick={()=>handleNavigation("about")}
+                             style={{cursor:"pointer"}}>About Us</div>
+                <div
+                onClick={()=>handleNavigation("contact")}
+                             style={{cursor:"pointer"}}>Contact Us</div>
             </div>
             <div
             style={{fontSize:"35px"}}

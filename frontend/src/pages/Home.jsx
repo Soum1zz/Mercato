@@ -13,10 +13,11 @@ import Hero from "../components/Hero";
 import About from "../components/About";
 import Contact from "../components/ContactUs"
 import {useNavigate} from "react-router-dom"
-import { useEffect } from "react";
-export default function Home({products}){
-
+import { useEffect, useRef } from "react";
+export default function Home({products, contactRef, aboutRef}){
+ 
     useEffect(()=>{
+
         const reveals= document.querySelectorAll(".reveal");
         const observer= new IntersectionObserver(
             entries=> {
@@ -41,8 +42,8 @@ export default function Home({products}){
     return(
         <div>
             <Hero/>
-            <About />
-            <Contact />
+            <div ref={aboutRef}><About /></div>
+            <div ref={contactRef}><Contact /></div> 
         </div>
     )
 }
