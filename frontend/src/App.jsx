@@ -9,6 +9,10 @@ import ProductForm from './components/ProductForm'
 import Products from './pages/Products'
 import ProductDetail from './pages/ProductDetail'
 import CustomerDetail from './pages/CustomerDetail'
+import AdminDash from './pages/AdminDash'
+import SellerReviewDash from './pages/SellerReviewDash'
+import SellerDash from './pages/SellerDash'
+import ProtectedRoute from './auth/ProtectedRoute'
 function App() {
   const [theme, setTheme]=  useState ("light");
   const[products, setProducts]= useState([]);
@@ -34,7 +38,11 @@ function App() {
           <Route path='/products' element={<Products />} />
           <Route path='/product/:id' element={<ProductDetail />} />
           <Route path='/auth' element={<Authenticate />} />
-          <Route path='/customer' element={<CustomerDetail />} />
+          <Route path='/sellers' element={<SellerReviewDash />} />
+          <Route path='/customer' element={<ProtectedRoute><CustomerDetail /></ProtectedRoute> } />
+          <Route path='/admin' element={<ProtectedRoute><AdminDash /></ProtectedRoute> } />
+          <Route path='/seller' element={<ProtectedRoute><SellerDash /></ProtectedRoute> } />
+            
         </Routes>
       
     </div>

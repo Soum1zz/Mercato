@@ -1,4 +1,5 @@
 .customer-div{
+    
     padding: 5rem;
     display: flex;
     justify-content:space-around;
@@ -71,7 +72,6 @@
 }
 .customer-right-fields label{
     flex: 0 0 200px;
-    /* text-align: left;  */
 
 }
 .customer-right input{

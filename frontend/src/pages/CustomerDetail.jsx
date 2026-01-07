@@ -1,20 +1,97 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import '../styles/customer.css'
+import { FaCamera } from "react-icons/fa";
 import { FaBagShopping } from "react-icons/fa6";
 import { IoMdHeart } from "react-icons/io";
 import { TbUserFilled } from "react-icons/tb";
 import Wishlist from "../components/Wishlist"
 import CustomerForm from "../components/CustomerForm"
 import Orders from "../components/Orders"
-
+import { getToken, isTokenExpired, logout } from '../auth/authService';
+import { useNavigate } from 'react-router-dom';
 export default function CustomerDetail(){
     const[content, setContent]= useState("CustomerForm");
+    const[user, setUser]= useState(null);
+    const navigate=useNavigate();
+    const [isForm, setForm]= useState(false);
+    const imgUrl=user?`http://localhost:8080/api/user/${user.userId}/image`:null;
+    const [preview, setPreview]= useState(null);
+    const [imageFile, setImageFile]= useState(null);
+
+    const fileInputRef= useRef(null);
+    const handleClick= ()=>{
+        fileInputRef.current.click();
+    }
+    const handleImageChange= (e)=>{
+        const file= e.target.files[0];
+        if(!file)return;
+        setImageFile(file);
+        const objUrl=URL.createObjectURL(file);
+        setPreview(objUrl);
+    }
+    useEffect(()=>{
+        const fetchUser=async()=>{      
+            setPreview(imgUrl);         
+            console.log(getToken());
+            if(!getToken()) {
+                navigate("/auth");
+                return;}
+            if(isTokenExpired(getToken())){
+                logout();
+                navigate("/auth");
+                return;
+            }
+            try{
+                const resUser= await fetch("http://localhost:8080/auth/me",{
+                headers:{
+                    "Authorization": `Bearer ${getToken()}`,
+                    "Content-Type": "application/json"
+                }
+              });
+              if(resUser.status===401){
+                logout();
+                navigate("/auth");
+                return;
+              }
+              if(!resUser.ok){
+                throw new Error(`Http error! status: ${resUser.status}`)
+              }
+              
+
+                const data = await resUser.json();
+                setUser(data);
+            setPreview(`http://localhost:8080/api/user/${data.userId}/image`);
+
+            }catch(e){
+                console.error("Failed to fetch user", e);
+            }
+            
+        };
+            fetchUser();
+
+    },[navigate]);
 return(
     <div className='customer-div'>
           <div className='customer-nav'>
             <div className='customer-img'>
-                <img alt='profile img'/>
-                <p>Customer Name</p>
+                <img 
+                src={preview}
+                alt={user?.name}/>
+                {
+                    isForm &&(
+                        <div className='cam-icon' onClick={handleClick}>
+                            <FaCamera/>
+                        </div>
+                    )
+                }
+                <input
+                type='file'
+                accept='image/*'
+                ref={fileInputRef}
+                onChange={handleImageChange}
+                hidden
+                />
+                <p>{user?.name}</p>
             </div>
             <div className='nav-sub'>
                  <div onClick={()=>setContent("CustomerForm")} className={`nav-sub-cat ${content==="CustomerForm"?"active":''}`} >
@@ -32,9 +109,9 @@ return(
             </div>
           </div>
           <div className="prof-sub-div">
-              {content ==="CustomerForm"&& <CustomerForm />}
-              {content ==="Wishlist"&&<Wishlist/>}
-              {content ==="Orders"&&<Orders />}
+              {content ==="CustomerForm"&& <CustomerForm user={user} isForm={isForm} setForm={setForm} imageFile={imageFile}/>}
+              {content ==="Wishlist"&&<Wishlist user={user}/>}
+              {content ==="Orders"&&<Orders user={user}/>}
           </div>
     </div>
 )
