@@ -5,17 +5,27 @@ import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { IoCart } from "react-icons/io5";
 import cart from '../assets/cart-no-notif.png'
-import cartNotif from '../assets/cart-yes-notif.png'
-import profile from '../assets/black-icon.png'
 import { getCurrentUser, isAuthenticated, logout } from "../auth/authService";
+import { FaUser } from "react-icons/fa";
+import { TbShoppingCart, TbShoppingCartExclamation } from "react-icons/tb";
 
 export default function Navbar({ scrollToAbout, scrollToContact}){
     const navigate= useNavigate();
     const location= useLocation();
     const [authenticated, setAuthenticated]= useState(isAuthenticated());
     const [searchBarOpen, setSearchBarOpen]= useState(false);
+    const[searchQuery, setSearchQuery] = useState("");
+
     const searchRef= useRef(null);
 
+    const handleSearch= ()=>{
+        if(!searchQuery.trim())return;
+
+        navigate("/products",{
+            state: {search: searchQuery}
+        });
+        setSearchBarOpen(false);
+    }
     const handleLogOut=()=>{
         logout();
         setAuthenticated(false);
@@ -96,23 +106,45 @@ export default function Navbar({ scrollToAbout, scrollToContact}){
                 ref={searchRef
                 }
                 >
-                {searchBarOpen&&(<div className="search-field"><input type="text" placeholder="search products...."/></div>)}
+                {searchBarOpen&&(
+                    <div className="search-field">
+                    <input type="text" 
+                        placeholder="search products...."
+                        value={searchQuery}
+                        onChange={(e)=>setSearchQuery(e.target.value)}
+                        onKeyDown={(e)=>e.key === "Enter" &&handleSearch()}
+                    />
+                    </div>)}
 
-                 <IoMdSearch
-                    onClick={()=>setSearchBarOpen(prev => !prev)}
+                 <IoMdSearch size={40}
+                 style={{marginTop:"10px", cursor:"pointer"}}
+                    onClick={()=>{
+                        if(searchBarOpen&& searchQuery.trim()){
+                            handleSearch();
+                        }else{
+                            setSearchBarOpen(true);
+                        }
+                        }}
                  />
                 </div>
                 <div
-                
+                style={{
+                    display:"flex",alignItems:"baseline"
+                }}
                 >
                 {authenticated &&
-                (<button onClick={handleLogOut}>Log out</button>)}
-                <img src={profile} width="35px"
+                (<button className="log-out-btn" onClick={handleLogOut}>Log out</button>)}
+                </div>
+                <FaUser size={30}
                     onClick={handleAuth}
                 />
                 
-                </div>
-                <div><img src={cart} width="34px"/></div>
+                
+                <div
+                onClick={()=>navigate("/cart")}
+                ><TbShoppingCart
+                style={{position: "absolute", top: "3rem"}}
+                 size={35}/></div>
             </div>
 
         </div>

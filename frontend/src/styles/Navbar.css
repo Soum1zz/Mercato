@@ -38,11 +38,16 @@ select {
   gap: 2rem;
   width: 20%;
 }
-
+.log-out-btn{
+  padding: 0.5rem;
+  background: transparent;
+  border: 1px solid black;
+}
 .search-field input {
   position: absolute;
   padding: 1rem;
   width: 200px;
   height: 1px;
-  right: 23vw;
+  right: 25vw;
+  top: 3rem;
 }

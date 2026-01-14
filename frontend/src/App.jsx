@@ -5,7 +5,7 @@ import Navbar from './components/Navbar'
 import Home from './pages/Home'
 import Authenticate from './pages/Authenticate'
 import Cart from './pages/Cart'
-import ProductForm from './components/ProductForm'
+import ProductForm from './pages/ProductForm'
 import Products from './pages/Products'
 import ProductDetail from './pages/ProductDetail'
 import CustomerDetail from './pages/CustomerDetail'
@@ -38,11 +38,12 @@ function App() {
           <Route path='/products' element={<Products />} />
           <Route path='/product/:id' element={<ProductDetail />} />
           <Route path='/auth' element={<Authenticate />} />
-          <Route path='/sellers' element={<SellerReviewDash />} />
+          <Route path='/seller-review' element={<ProtectedRoute><SellerReviewDash /></ProtectedRoute>} />
           <Route path='/customer' element={<ProtectedRoute><CustomerDetail /></ProtectedRoute> } />
           <Route path='/admin' element={<ProtectedRoute><AdminDash /></ProtectedRoute> } />
           <Route path='/seller' element={<ProtectedRoute><SellerDash /></ProtectedRoute> } />
-            
+          <Route path='/add-product' element={<ProtectedRoute><ProductForm/></ProtectedRoute> } />
+
         </Routes>
       
     </div>

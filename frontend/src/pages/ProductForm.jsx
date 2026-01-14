@@ -1,16 +1,21 @@
+import { useLocation, useNavigate } from 'react-router-dom';
+import '../styles/productForm.css'
+import { getCurrentUser, getToken } from '../auth/authService';
 export default function ProductForm() {
-    const categories=[
-        "Electronics", "Fashion", "Home & Living", 
+    const state= useLocation();
+    const categories = [
+        "Electronics", "Fashion", "Home & Living",
         "Beauty & Personal Care", "Books"
     ];
-    return (<div>
-        <form
+    const navigate = useNavigate();
+    return (<div className='add-form-div'>
+        <div style={{ fontSize: "39px" }}>Add your product</div>
+        <form className='add-form'
             onSubmit={async (e) => {
                 e.preventDefault();
 
                 const form = e.currentTarget;
                 const rawFormData = new FormData(form);
-
                 const ProductData = {
                     name: rawFormData.get("name"),
                     description: rawFormData.get("description"),
@@ -19,8 +24,7 @@ export default function ProductForm() {
                     category: rawFormData.get("category"),
                     stock: parseInt(rawFormData.get("stock"), 10) || 0,
                     status: rawFormData.get("status"),
-                    date: rawFormData.get("date"),
-
+                    date: rawFormData.get("date")
                 };
 
                 const dataToSend = new FormData();
@@ -37,9 +41,12 @@ export default function ProductForm() {
                     dataToSend.append("image", imageFile);
                 }
                 try {
-                    const response = await fetch("http://localhost:8080/api/products",
+                    const response = await fetch("http://localhost:8080/seller/products",
                         {
                             method: "POST",
+                            headers: {
+                                "Authorization": `Bearer ${getToken()}`,
+                            },
                             body: dataToSend,
                         });
 
@@ -48,6 +55,7 @@ export default function ProductForm() {
                         console.log("Success:", result);
                         alert("Product added!");
                         form.reset();
+                        navigate("/seller")
                     } else {
                         const errorText = await response.text();
                         console.error("Server Error Status:", response.status, "Message:", errorText);
@@ -74,7 +82,7 @@ export default function ProductForm() {
             <label>Product Category:
                 <select name="category" defaultValue={categories[0]}>
                     {
-                        categories.map((cat)=>(
+                        categories.map((cat) => (
                             <option key={cat} value={cat}>{cat}</option>
                         ))
                     }
@@ -90,11 +98,11 @@ export default function ProductForm() {
             <label>Release Date:
                 <input type="date" name="date" />
             </label><br />
-            <label>image:
+            <label>Image of the product:
                 <input type="file" name="image" />
             </label><br />
 
-            <button >Submit</button>
+            <button className='add-submit-btn'>Submit</button>
         </form>
     </div>)
 }

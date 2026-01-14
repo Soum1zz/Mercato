@@ -192,7 +192,6 @@ export default function ProductDetail() {
                 <div>• Free shipping on orders over ₹ 500</div>
             </div>
             
-            <button onClick={() => setEdit(true)}>edit product</button>
 
             <div><h2>Comments:</h2>
 

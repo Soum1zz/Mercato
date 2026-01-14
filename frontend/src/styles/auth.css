@@ -1,6 +1,5 @@
 .auth-div{
     position: relative;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     transform: translateX(30vw) translateY(3vw);
     padding: 2.5rem;
     display: flex;

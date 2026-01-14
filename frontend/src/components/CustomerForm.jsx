@@ -76,12 +76,14 @@ export default function CustomerForm({ user, isForm, setForm, imageFile }) {
         <input disabled={isForm === false} name="pinCode" defaultValue={user?.pinCode} />
       </div>
       <div >
-        {isForm === false ?
-          (<div className="prof-btn"  onClick={btnHandler}>Edit Profile</div>) :
+        {isForm === true &&
           (<button className="prof-btn" type="submit"
           >Save Changes</button>)}
       </div>
-    </form>
+        { isForm === false&&
+        <button className="prof-btn"  onClick={btnHandler}>Edit Profile</button>
+        }
+        </form>
 
     <p style={{
       transform: "translateX(40%)",

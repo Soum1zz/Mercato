@@ -1,0 +1,30 @@
+/* .orders-wrapper{
+    padding: 30px;
+    color: #e5e7eb;
+} */
+
+.order-card{
+    border: 1px solid  rgba(0, 0, 0, 0.3);
+}
+
+.order-row{
+    display : grid;
+    grid-template-columns: 1.5fr 1.3fr 1fr 0.8fr 1fr ;
+    align-items: center;
+}
+
+.order-header{
+    background: #6b1d4d;
+    color: #e5e7eb;
+    padding: 1rem;
+}
+.order-data{
+    padding: 1rem;
+
+}
+.status {
+  width: fit-content;
+  padding: 4px 10px;
+  border-radius: 999px;
+  text-transform: capitalize;
+}

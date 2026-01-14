@@ -38,7 +38,6 @@
 }
 .hero-sub-txt{
     font-size: 25px;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 .hero-btn {
   cursor: pointer;
@@ -70,5 +69,4 @@
   font-weight: 600;
   color: rgba(39, 36, 36, 0.76);
   gap: 1rem;
-  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
