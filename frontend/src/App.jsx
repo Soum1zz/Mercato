@@ -13,6 +13,7 @@ import AdminDash from './pages/AdminDash'
 import SellerReviewDash from './pages/SellerReviewDash'
 import SellerDash from './pages/SellerDash'
 import ProtectedRoute from './auth/ProtectedRoute'
+import { Toaster } from 'react-hot-toast'
 function App() {
   const [theme, setTheme]=  useState ("light");
   const[products, setProducts]= useState([]);
@@ -21,14 +22,15 @@ function App() {
   const contactRef=useRef(null);
   return (
     <div className={`wrapper ${theme==="light"? "":" active"}`}>
-       {!noNavbar.includes(location.pathname) &&<  Navbar 
+      
+        {!noNavbar.includes(location.pathname) &&<  Navbar 
 
         scrollToAbout={()=>aboutRef.current?.scrollIntoView({ behavior:"smooth"})}
         scrollToContact={()=>contactRef.current?.scrollIntoView({ behavior:"smooth"})}
 
-
+       
        theme={theme} setTheme={setTheme} setProducts={setProducts}/>}
-
+      <Toaster position='top-right' />
         <Routes>
           <Route path='/' element={<Home products={products} aboutRef={aboutRef}
           contactRef={contactRef}/>} />
@@ -45,6 +47,7 @@ function App() {
           <Route path='/add-product' element={<ProtectedRoute><ProductForm/></ProtectedRoute> } />
 
         </Routes>
+       
       
     </div>
   )

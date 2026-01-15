@@ -9,7 +9,7 @@ export default function Cart(){
     return(
         <div >
            {
-            !token ?(
+            token ?(
                 <div
                 className="cart-div no-cart"
                 >

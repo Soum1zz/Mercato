@@ -8,7 +8,7 @@ export default function CartItem(){
             </div>
             <div><button className="cart-btn">Remove</button></div>
             <div style={{color: "#6b1d4d", fontWeight:"bolder"}}>price</div>
-            
+            <div>delete</div>
         </div>
     )
 }

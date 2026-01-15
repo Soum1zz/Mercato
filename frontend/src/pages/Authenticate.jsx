@@ -86,7 +86,8 @@ export default function Authenticate() {
                             alert(`Failed with status ${response.status}. Check backend logs.`);
                         }
                     } catch (e) {
-                        console.log("Network Error: ", e);
+                        if(e.response?.status===409)
+                        alert("Email already exists!");
                     }
                     navigate("/auth");
 
