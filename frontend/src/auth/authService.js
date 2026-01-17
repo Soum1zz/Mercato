@@ -7,7 +7,10 @@ export function saveToken(token){
 }
 
 export function getToken(){
-    return localStorage.getItem(TOKEN_KEY)
+    const token= localStorage.getItem(TOKEN_KEY);
+    if(!token || token==="null"||token==="undefined")return null;
+
+    return token;
 }
 export function isTokenExpired(token){
     if(!token)return true;

@@ -85,9 +85,10 @@ export default function SellerDash() {
         <div className="seller-div">
             <h1>Hello {user?.name}</h1>
             <h2>Mercato values your products.</h2>
-            <div className={`sell-veri-div ${sellDet?.status === "PENDING" ? "" : "active"}`}>
+            <div className={`sell-veri-div ${sellDet?.status === "PENDING"||sellDet === null ? "" : "active"}`}>
                 {
-                    sellDet?.status === "PENDING" ? (<div className="veri-stat">
+                    sellDet?.status === "PENDING"||sellDet === null
+                     ? (<div className="veri-stat">
                         <div style={{ fontSize: "30px" }}>Your verification is pending</div>
                         <div>Please provide your business details to get verified and post your products.</div>
                         <div>P.S. we value your privacy.</div>

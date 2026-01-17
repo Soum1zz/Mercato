@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../styles/productForm.css'
 import { getCurrentUser, getToken } from '../auth/authService';
+import toast from 'react-hot-toast';
 export default function ProductForm() {
     const state= useLocation();
     const categories = [
@@ -23,7 +24,6 @@ export default function ProductForm() {
                     brand: rawFormData.get("brand"),
                     category: rawFormData.get("category"),
                     stock: parseInt(rawFormData.get("stock"), 10) || 0,
-                    status: rawFormData.get("status"),
                     date: rawFormData.get("date")
                 };
 
@@ -53,13 +53,13 @@ export default function ProductForm() {
                     if (response.ok) {
                         const result = await response.json();
                         console.log("Success:", result);
-                        alert("Product added!");
+                        toast.success("Product added!");
                         form.reset();
                         navigate("/seller")
                     } else {
                         const errorText = await response.text();
                         console.error("Server Error Status:", response.status, "Message:", errorText);
-                        alert(`Failed with status ${response.status}. Check backend logs.`);
+                        toast.error("Product not added!");
                     }
                 } catch (e) {
                     console.error("Network Error:", e);
@@ -91,9 +91,6 @@ export default function ProductForm() {
             </label><br />
             <label>Product Stock:
                 <input type="number" step="1" min="0" name="stock" />
-            </label><br />
-            <label>Product Status:
-                <input type="text" name="status" />
             </label><br />
             <label>Release Date:
                 <input type="date" name="date" />

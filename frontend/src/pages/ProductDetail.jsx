@@ -4,6 +4,8 @@ import { FaMinus, FaPlus } from "react-icons/fa6";
 import { GoArrowDown, GoHeart, GoHeartFill } from "react-icons/go";
 
 import '../styles/productDetail.css'
+import { getCurrentUser, getToken } from "../auth/authService";
+import toast from "react-hot-toast";
 export default function ProductDetail() {
     const { id } = useParams();
     const [product, setProduct] = useState(null);
@@ -31,7 +33,40 @@ export default function ProductDetail() {
         fetchProduct();
     }, [id]);
 
-    const addToCartHandler = () => {
+    const addToCartHandler = async() => {
+            if(!getCurrentUser()){
+                toast.error("You need to login");
+                navigate("/auth");
+            }
+            const payload= {
+                productId: product.id,
+                quantity: count
+            }
+            try{const res=await fetch("http://localhost:8080/api/me/cart",
+                {
+                        method:"PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${getToken()}`,
+                        },
+                        body: JSON.stringify(payload)
+                }
+            )
+            if (!res.ok) {
+                    throw new Error("Failed adding to cart")
+                }
+            if(res.ok)
+                toast.success("Added to cart");
+                const data = await res.json();
+            } catch (e) {
+                console.error(e);
+            }
+    }
+    const orderHandler= ()=>{
+            if(!getCurrentUser()){
+                toast.error("You need to login");
+                navigate("/auth");
+            }
 
     }
     const imageUrl = `http://localhost:8080/api/product/${id}/image`
@@ -185,8 +220,12 @@ export default function ProductDetail() {
                 ><FaPlus/> </div>
 
             </div>
-
-            <button onClick={addToCartHandler} className="prod-det-btn">Add to cart</button>
+            {
+              product.stock === 0? 
+                (<button disabled>Out of stock</button>):
+                (<button onClick={addToCartHandler} className="prod-det-btn">Add to cart</button>)
+            }
+                <button onClick={orderHandler} className="prod-det-btn">Order now</button>
             <div>
                 <div>• In Stock</div>
                 <div>• Free shipping on orders over ₹ 500</div>

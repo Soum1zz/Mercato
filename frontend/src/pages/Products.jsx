@@ -10,6 +10,7 @@ import { useEffect, useState } from "react"
 import ProductCard from "../components/ProductCard";
 import "../styles/products.css"
 import { data, useLocation } from "react-router-dom";
+import Loader  from "../components/Loader"
 export default function Products() {
     const location = useLocation();
     const search = location.state?.search || "";
@@ -52,7 +53,7 @@ export default function Products() {
         
     }, [content,search]
     );
-    if (loading) return <p>Loading products.....</p>
+    if (loading) return <Loader></Loader>
     console.log(products);
     return (
         <div className="prods-div">

@@ -70,6 +70,10 @@ export default function CustomerDetail(){
             fetchUser();
 
     },[navigate]);
+    const userName=user?.name||"";
+    let Name="";
+    if(userName.length>18)Name= userName.substring(0,18)+"...";
+    else Name=userName;
 return(
     <div className='customer-div'>
           <div className='customer-nav'>

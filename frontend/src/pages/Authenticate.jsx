@@ -3,14 +3,15 @@ import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
 import { IoReturnUpBack } from "react-icons/io5";
 import "../styles/auth.css"
 import { useNavigate } from "react-router-dom";
-
+import Loader from "../components/Loader"
 import { saveToken } from "../auth/authService";
 import { jwtDecode } from "jwt-decode";
+import toast from "react-hot-toast";
 export default function Authenticate() {
 
 
-    const [loginForm, setLoginForm] = useState(null);
-    const [signupForm, setSignUpForm] = useState(null);
+    // const [loginForm, setLoginForm] = useState(null);
+    // const [signupForm, setSignUpForm] = useState(null);
 
 
     const navigate = useNavigate();
@@ -25,6 +26,8 @@ export default function Authenticate() {
     const hasEmptySpace = !passwordData.password.includes(" ");
     const strengthScore = [hasNumber, hasSpecial, hasEightChar, hasEmptySpace].filter(Boolean).length;
     const [role, setRole] = useState("CUSTOMER");
+    const [loading, setLoading] = useState(false);
+
 
     const strengthColorHandler = () => {
         if (passwordData.password.length === 0) return "transparent";
@@ -47,15 +50,21 @@ export default function Authenticate() {
 
     const handleShow = () => setShowPassword(true);
     const handleHide = () => setShowPassword(false);
+
+    if(loading === true) return <Loader></Loader>
+
     return (
         <div className="auth-div">
+            
+            
             <form className="form-grid" onSubmit={async (e) => {
                 e.preventDefault();
-
                 const form = e.currentTarget;
                 const rawFormData = new FormData(form);
                                 console.log(rawFormData.get("name"));
                 if (isLogin) {
+                    setLoading(true);
+
                     const payLoad = {
                         name: rawFormData.get("name"),
                         phoneNumber: Number(rawFormData.get("number")),
@@ -77,25 +86,24 @@ export default function Authenticate() {
                             }
                         );
                         if (response.ok) {
-                            const result = await response.json();
-                            console.log("success");
-                            window.alert("You have successfully Signed up!");
+                            toast.success("You have successfully signed up to Mercato");
+                            setLogin(false);
+                        
                         } else {
-                            const errorText = await response.text();
-                            console.error("Server Error Status:", response.status, "Message:", errorText);
-                            alert(`Failed with status ${response.status}. Check backend logs.`);
+                            if(response?.status===409)
+                                toast.error("Email already exists!");
+                            else
+                                toast.error("Sign up failed");
                         }
                     } catch (e) {
                         if(e.response?.status===409)
-                        alert("Email already exists!");
+                        toast.error("Email already exists!");
                     }
-                    navigate("/auth");
+                   setLoading(false)
 
                 } else {
-                    if (!rawFormData.get("pincode")) {
-                        console.log("Pincode required");
-                    }
-
+                    
+                    setLoading(true)
                     const payLoad = {
                         email: rawFormData.get("email"),
                         password: rawFormData.get("password")
@@ -117,7 +125,7 @@ export default function Authenticate() {
                         if (response.ok) {
                             const result = await response.json();
                             console.log("success");
-                            window.alert("You have successfully loged in!");
+                            toast.success("You have successfully logged in to Mercato");
                             saveToken(result.token);
                             const decoded = jwtDecode(result.token);
                             const role = decoded.role;
@@ -127,13 +135,13 @@ export default function Authenticate() {
                         } else {
                             const errorText = await response.text();
                             console.error("Server Error Status:", response.status, "Message:", errorText);
-                            alert(`Failed with status ${response.status}. Check backend logs.`);
+                            toast.error("Log in failed");
                         }
                     } catch (e) {
                         console.log("Network Error: ", e);
                     }
 
-
+                    setLoading(false)
                 }
 
 

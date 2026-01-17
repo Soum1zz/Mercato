@@ -112,6 +112,6 @@
 }
 .pass-instr{
     position: absolute;
-    transform: translateY(290%);
+    transform: translateY(200%);
     font-size: 10px;
 }
