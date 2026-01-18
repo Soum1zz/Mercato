@@ -30,7 +30,7 @@ function App() {
 
        
        theme={theme} setTheme={setTheme} setProducts={setProducts}/>}
-      <Toaster position='top-right' />
+      <Toaster position='bottom-left' />
         <Routes>
           <Route path='/' element={<Home products={products} aboutRef={aboutRef}
           contactRef={contactRef}/>} />
