@@ -24,7 +24,7 @@ public class SellerService {
     @Autowired
     UserRepo userRepo;
     @Transactional
-    public void setSellerDetails(long sellerId, SellerDetailReq req, MultipartFile imgFile) throws IOException {
+    public void setSellerDetails(long sellerId, SellerDetailReq req) throws IOException {
         User user = userRepo.findById(sellerId).orElseThrow(()->new RuntimeException("User not found"));
         SellerDetails seller = sellerDetailsRepo.findByUser_UserId(sellerId)
                 .orElseGet(()->{
@@ -38,11 +38,9 @@ public class SellerService {
         seller.setBusinessDescription(req.description());
         seller.setTaxId(req.taxId());
         seller.setUser(user);
-        if(imgFile!=null&&!imgFile.isEmpty())
+        if(req.imgUrl()!=null&&!req.imgUrl().isEmpty())
         {
-            seller.setCertificateImageName(imgFile.getOriginalFilename());
-            seller.setCertificateImageData(imgFile.getBytes());
-            seller.setCertificateImageType(imgFile.getContentType());
+            seller.setCertificateImageUrl(req.imgUrl());
         }
         sellerDetailsRepo.save(seller);
     }
@@ -76,8 +74,8 @@ public class SellerService {
         return sellers;
     }
 
-    public byte[] getCertificateImage(Long userId) {
+    public String getCertificateImage(Long userId) {
         SellerDetails seller= sellerDetailsRepo.findByUser_UserId(userId).orElseThrow(()->new RuntimeException("User not found"));
-        return seller.getCertificateImageData();
+        return seller.getCertificateImageUrl();
     }
 }

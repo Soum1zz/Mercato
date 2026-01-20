@@ -31,8 +31,6 @@ public class ProductService {
                 product.getCategory(),
                 product.getStock(),
                 product.getStatus().toString(),
-                product.getImageName(),
-                product.getImageType(),
                 product.getSeller().getUserId()
         );
     }
@@ -42,7 +40,7 @@ public class ProductService {
         return toProductResponse(product);
     }
 
-    public ProductResponse addProduct(User seller, ProductRequest req, MultipartFile img) throws IOException {
+    public ProductResponse addProduct(User seller, ProductRequest req) throws IOException {
         // 1. Create a new Product entity
         Product product = new Product();
 
@@ -55,20 +53,14 @@ public class ProductService {
         product.setStock(req.stock());
         product.setStatus(req.stock()>0? Product.ProductStatus.AVAILABLE: Product.ProductStatus.OUT_OF_STOCK);
         product.setReleaseDate(req.date());
-
-        product.setSeller(seller);
-        // 3. Handle the Image file if it exists
-        if (img != null && !img.isEmpty()) {
-            product.setImageName(img.getOriginalFilename());
-            product.setImageType(img.getContentType());
-            product.setImageData(img.getBytes());
+        if (req.imgUrl()!=null && !req.imgUrl().isBlank()) {
+            product.setImageUrl(req.imgUrl());
         }
-
-        // 4. Save to Database and convert the saved result to a Response DTO
+        product.setSeller(seller);
         Product savedProduct = productRepo.save(product);
         return toProductResponse(savedProduct);
     }
-    public ProductResponse updateProduct(long id , ProductRequest req, MultipartFile img)throws IOException {
+    public ProductResponse updateProduct(long id , ProductRequest req )throws IOException {
 
         Product old = productRepo.findById(id).orElseThrow(()->new RuntimeException("Product not found"));
 
@@ -80,11 +72,8 @@ public class ProductService {
         old.setPrice(req.price());
         old.setCategory(req.category());
         old.setReleaseDate(req.date());
-
-        if(img != null && !img.isEmpty()) {
-            old.setImageName(img.getOriginalFilename());
-            old.setImageType(img.getContentType());
-            old.setImageData(img.getBytes());
+        if (req.imgUrl()!=null && !req.imgUrl().isBlank()) {
+            old.setImageUrl(req.imgUrl());
         }
 
         return  toProductResponse(productRepo.save(old));
@@ -115,9 +104,9 @@ public class ProductService {
         productRepo.deleteById(productId);
     }
 
-    public byte[] getImage(long id) {
+    public String getImage(long id) {
         Product product = productRepo.findById(id).orElseThrow(()->new RuntimeException("Product not found"));
-        return product.getImageData();
+        return product.getImageUrl();
     }
 
     public List<ProductResponse> findByCategory(String category) {

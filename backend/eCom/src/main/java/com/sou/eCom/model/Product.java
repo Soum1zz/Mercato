@@ -35,10 +35,7 @@ public class Product {
     @OneToMany( mappedBy = "product" , cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Comment> comments;
     //image
-    private String imageName;
-    private String imageType;
-    @Lob
-    private byte[] imageData;
+    private String imageUrl;
 
     public Product(Long id){this.id=id;}
 }

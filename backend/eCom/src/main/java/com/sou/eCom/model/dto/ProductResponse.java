@@ -9,8 +9,6 @@ public record ProductResponse(
         String category,
         int stock,
         String status,
-        String imageName,
-        String imageType,
         long sellerId
 ) {
 }

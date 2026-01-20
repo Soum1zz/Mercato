@@ -26,7 +26,7 @@ public class CommentService {
     @Autowired
     private ProductRepo productRepo;
 
-    public CommentResponse addComment(long productId, CommentRequest commentRequest, MultipartFile img) throws IOException {
+    public CommentResponse addComment(long productId, CommentRequest commentRequest) throws IOException {
         Comment comment = new Comment();
         Product product = productRepo.findById(productId).orElseThrow(()->new RuntimeException("product not found"));
         User user =userRepo.findByUserId(commentRequest.userId()).orElseThrow(()->new RuntimeException("user not found"));
@@ -38,11 +38,9 @@ public class CommentService {
             comment.setCommentBody(commentRequest.desc());
             comment.setRating(commentRequest.rating());
             comment.setCreatedDate(LocalDate.now());
-        if(img != null)
+        if(commentRequest.imgUrl() != null && !commentRequest.imgUrl().isEmpty())
         {
-            comment.setImageName(img.getOriginalFilename());
-            comment.setImageType(img.getContentType());
-            comment.setImageData(img.getBytes());
+            comment.setImageUrl(commentRequest.imgUrl());
         }
         commentRepo.save(comment);
         return toCommentResponse(comment);
@@ -50,15 +48,13 @@ public class CommentService {
 
     }
 
-    public CommentResponse updateComment(long commentId, CommentRequest commentRequest, MultipartFile img) throws IOException {
+    public CommentResponse updateComment(long commentId, CommentRequest commentRequest) throws IOException {
             Comment oldComment= commentRepo.findById(commentId).orElseThrow(()->new RuntimeException("comment not found"));
             oldComment.setRating(commentRequest.rating());
             oldComment.setCommentBody(commentRequest.desc());
-        if(img != null)
+        if(commentRequest.imgUrl() != null && !commentRequest.imgUrl().isEmpty())
         {
-            oldComment.setImageName(img.getOriginalFilename());
-            oldComment.setImageType(img.getContentType());
-            oldComment.setImageData(img.getBytes());
+            oldComment.setImageUrl(commentRequest.imgUrl());
         }
 
         commentRepo.save(oldComment);
@@ -73,10 +69,8 @@ public class CommentService {
                 oldComment.getCommentBody(),
                 oldComment.getRating(),
                 oldComment.getUser().getUserId(),
-                oldComment.getUser().getUserName(),
-                oldComment.getImageName(),
-                oldComment.getImageType(),
-                oldComment.getImageData()
+                oldComment.getUser().getUserName()
+
         );
 
         return commentResponse;
@@ -111,5 +105,10 @@ public class CommentService {
 
         }
         return commentResponses;
+    }
+
+    public String getImg(Long commentId) {
+        Comment comment=commentRepo.findById(commentId).orElseThrow(()->new RuntimeException("comment not found"));
+        return comment.getImageUrl();
     }
 }

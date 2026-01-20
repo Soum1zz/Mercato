@@ -42,9 +42,18 @@ public class UserController {
         return new ResponseEntity<>(userService.getUser(principal.getUser().getUserId()), HttpStatus.OK );
     }
     @GetMapping("/user/{userId}/image")
-    public ResponseEntity<byte[]> getCurrentUserImage(@PathVariable long userId) {
+    public ResponseEntity<String> getCurrentUserImage(@PathVariable long userId) {
         return userService.getImage(userId);
+    }
+    @PutMapping("/user/{userId}/image")
+    public ResponseEntity<?> putCurrentUserImage(@PathVariable long userId, @RequestParam String imageUrl) {
+        try {
+            userService.putImage(userId, imageUrl);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
 
+            throw new RuntimeException(e);
+        }
     }
     @PreAuthorize("hasRole('CUSTOMER')")
     @GetMapping("/me/cart")
@@ -59,8 +68,8 @@ public class UserController {
 
 
     @PutMapping("/me")
-    public  ResponseEntity<UserResponse> updateUser(@AuthenticationPrincipal UserPrincipal principal, @RequestPart(value ="image",required = false) MultipartFile picture, @RequestPart UserRequest user )throws IOException {
-        return new ResponseEntity<>(userService.updateUser(user, picture,principal.getUser().getUserId()),HttpStatus.OK);
+    public  ResponseEntity<UserResponse> updateUser(@AuthenticationPrincipal UserPrincipal principal, @RequestParam UserRequest user )throws IOException {
+        return new ResponseEntity<>(userService.updateUser(user,principal.getUser().getUserId()),HttpStatus.OK);
     }
 
 }

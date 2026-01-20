@@ -31,11 +31,10 @@ public class ProductController {
         return  new ResponseEntity<>(productService.getProduct(id), HttpStatus.OK);
     }
     @GetMapping("/product/{id}/image")
-    public ResponseEntity<byte[]> getImage(@PathVariable long id){
+    public ResponseEntity<String> getImage(@PathVariable long id){
         ProductResponse product = productService.getProduct(id);
-        byte[] img = productService.getImage(id);
+        String img = productService.getImage(id);
         return ResponseEntity.ok()
-                .header("Content-Type", product.imageType())
                 .body(img);
 
     }

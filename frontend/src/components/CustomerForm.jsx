@@ -1,7 +1,7 @@
+
 import '../styles/customerForm.css'
 import { getToken } from "../auth/authService";
-import { jwtDecode } from "jwt-decode";
-export default function CustomerForm({ user, isForm, setForm, imageFile }) {
+export default function CustomerForm({ user, isForm, setForm }) {
   const btnHandler = () => {
     setForm(true);
   }
@@ -32,10 +32,6 @@ export default function CustomerForm({ user, isForm, setForm, imageFile }) {
           "user.json"
         );
 
-
-        if (imageFile) {
-          dataToSend.append("image", imageFile);
-        }
         try{const response = await fetch("http://localhost:8080/api/me", {
           method: "PUT",
           headers: {

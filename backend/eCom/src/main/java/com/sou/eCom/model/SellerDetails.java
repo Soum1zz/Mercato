@@ -28,9 +28,6 @@ public class SellerDetails {
     @JoinColumn(name = "user_id", unique = true)
     private User user;
 
-    private String certificateImageName;
-    private String certificateImageType;
-    @Lob
-    private byte[] certificateImageData;
+    private String certificateImageUrl;
 
 }

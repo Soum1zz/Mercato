@@ -8,6 +8,7 @@ import com.sou.eCom.model.dto.*;
 import com.sou.eCom.repo.CommentRepo;
 import com.sou.eCom.repo.OrderRepo;
 import com.sou.eCom.repo.UserRepo;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -84,7 +85,7 @@ public class UserService {
         return orderResponses;
     }
 
-    public UserResponse addUser(UserRequest user, MultipartFile picture) throws IOException {
+    public UserResponse addUser(UserRequest user) throws IOException {
         User user1= new User();
         user1.setUserName(user.name());
         user1.setPassword(bCryptPasswordEncoder.encode(user.password()));
@@ -99,31 +100,19 @@ public class UserService {
             throw new RuntimeException("Invalid role");
         }
 
-
-        if(picture!=null){
-            user1.setImageName(picture.getOriginalFilename());
-            user1.setImageType(picture.getContentType());
-            user1.setImageData(picture.getBytes());
-        }
         User savedUser=userRepo.save(user1);
 
 
         return toUserResponse(savedUser);
     }
 
-    public UserResponse updateUser(UserRequest user, MultipartFile picture, Long userId) throws IOException {
+    public UserResponse updateUser(UserRequest user, Long userId) throws IOException {
         User user1= userRepo.findById(userId).orElseThrow(()->new RuntimeException("User Not Found"));
         user1.setUserName(user.name());
         user1.setEmail(user.email());
         user1.setPinCode(user.pinCode());
         user1.setAddress(user.address());
         user1.setPhoneNumber(user.phoneNumber());
-
-        if(picture!=null&& !picture.isEmpty()){
-            user1.setImageName(picture.getOriginalFilename());
-            user1.setImageType(picture.getContentType());
-            user1.setImageData(picture.getBytes());
-        }
         User updatedUser=userRepo.save(user1);
         return toUserResponse(updatedUser);
     }
@@ -144,20 +133,21 @@ public class UserService {
                     comment.getCommentBody(),
                     comment.getRating(),
                     comment.getUser().getUserId(),
-                    comment.getUser().getUserName(),
-                    comment.getImageName(),
-                    comment.getImageType(),
-                    comment.getImageData()
+                    comment.getUser().getUserName()
             ));
 
         }
         return commentResponses;
     }
 
-    public ResponseEntity<byte[]> getImage(Long userId) {
+    public ResponseEntity<String> getImage(Long userId) {
         User user= userRepo.findById(userId).orElseThrow(()->new RuntimeException("User not found"));
         return ResponseEntity.ok()
-                .header("Content-Type", user.getImageType())
-                .body(user.getImageData());
+                .body(user.getImageUrl());
+    }
+    @Transactional
+    public void putImage(Long userId, String imageUrl) {
+        User user= userRepo.findById(userId).orElseThrow(()->new RuntimeException("User not found"));
+        user.setImageUrl(imageUrl);
     }
 }

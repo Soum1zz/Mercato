@@ -36,19 +36,29 @@ public class CommentController {
     public  List<CommentResponse> getUserComments(@PathVariable Long userId) throws IOException {
         return commentService.getUserComment(userId);
     }
+
+    @GetMapping("/comment/{commentId}/image")
+    public ResponseEntity<?> getCommentImage(@PathVariable Long commentId) throws IOException {
+        try{
+           return new ResponseEntity<>(commentService.getImg(commentId),HttpStatus.OK) ;
+        }catch(Exception e){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR) ;
+        }
+    }
+
     @PostMapping("/product/{productId}/comments")
-    public ResponseEntity<CommentResponse> save(@PathVariable long productId , @RequestPart CommentRequest commentRequest, @RequestPart(required = false) MultipartFile img ) {
+    public ResponseEntity<CommentResponse> save(@PathVariable long productId , @RequestParam CommentRequest commentRequest ) {
         try {
-            return new ResponseEntity<>(commentService.addComment(productId, commentRequest, img), HttpStatus.CREATED);
+            return new ResponseEntity<>(commentService.addComment(productId, commentRequest), HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
     @PutMapping("/comment/{commentId}")
-    public ResponseEntity<CommentResponse> update(@PathVariable long commentId ,@RequestPart CommentRequest commentRequest, @RequestPart(required = false) MultipartFile img ) {
+    public ResponseEntity<CommentResponse> update(@PathVariable long commentId ,@RequestParam CommentRequest commentRequest ) {
         try {
-            return new ResponseEntity<>(commentService.updateComment(commentId, commentRequest, img), HttpStatus.CREATED);
+            return new ResponseEntity<>(commentService.updateComment(commentId, commentRequest), HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

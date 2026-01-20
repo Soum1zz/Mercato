@@ -45,8 +45,5 @@ public class User {
     Cart cart;
 
     //image
-    private String imageName;
-    private String imageType;
-    @Lob
-    private byte[] imageData;
+    private String imageUrl;
 }

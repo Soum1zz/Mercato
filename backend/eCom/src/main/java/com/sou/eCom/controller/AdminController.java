@@ -34,7 +34,7 @@ public class AdminController {
     }
 
     @GetMapping("/user/{userId}/image")
-    public ResponseEntity<byte[]> getImage(@PathVariable("userId") Long userId){
+    public ResponseEntity<String> getImage(@PathVariable("userId") Long userId){
         try{
             return userService.getImage(userId);
         }catch (Exception e){
@@ -42,9 +42,9 @@ public class AdminController {
         }
     }
     @GetMapping("/seller/{sellerId}/certificate")
-    public ResponseEntity<byte[]> getCertiImage(@PathVariable("sellerId") Long userId){
+    public ResponseEntity<?> getCertiImage(@PathVariable("sellerId") Long userId){
         try{
-            byte[] img= sellerService.getCertificateImage(userId);
+            String img= sellerService.getCertificateImage(userId);
             return  ResponseEntity.ok()
                     .body(img) ;
         }catch (Exception e){

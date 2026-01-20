@@ -52,7 +52,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<UserResponse> addUser(@RequestBody UserRequest user ) throws IOException {
-        return new ResponseEntity<>(userService.addUser(user, null),HttpStatus.CREATED);
+        return new ResponseEntity<>(userService.addUser(user),HttpStatus.CREATED);
     }
 
     @PostMapping("/login")

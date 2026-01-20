@@ -28,9 +28,6 @@ public class Comment {
     private double rating;
 
     //comment image
-    private String imageType;
-    private String imageName;
-    @Lob
-    private byte[] imageData;
+    private String imageUrl;
 
 }

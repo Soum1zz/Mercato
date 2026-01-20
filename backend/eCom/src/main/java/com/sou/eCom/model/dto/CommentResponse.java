@@ -11,10 +11,6 @@ public record CommentResponse(
         double rating,
 
         long userId,
-        String userName,
-
-        String imageName,
-        String imageType,
-        byte[] imageData
+        String userName
 ) {
 }

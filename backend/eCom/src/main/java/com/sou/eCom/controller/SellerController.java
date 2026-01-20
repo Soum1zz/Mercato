@@ -37,13 +37,13 @@ public class SellerController {
         }
     }
     @PostMapping(value = "/products", consumes = "multipart/form-data")
-    public ResponseEntity<?> createProduct(@RequestPart("request") ProductRequest request, @RequestPart(value = "image",required = false) MultipartFile image){
+    public ResponseEntity<?> createProduct(@RequestParam ProductRequest request){
         try{
             Authentication auth =
                     SecurityContextHolder.getContext().getAuthentication();
 
             UserPrincipal userPrincipal = (UserPrincipal) auth.getPrincipal();
-            ProductResponse product1=productService.addProduct(userPrincipal.getUser(),request, image);
+            ProductResponse product1=productService.addProduct(userPrincipal.getUser(),request);
             return new ResponseEntity<>(product1,HttpStatus.OK);
         }catch(Exception e){
             System.err.println("error");
@@ -53,9 +53,9 @@ public class SellerController {
     }
 
     @PutMapping("/product/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable long id, @RequestPart("request") ProductRequest product, @RequestPart(value = "image", required = false) MultipartFile image){
+    public ResponseEntity<?> updateProduct(@PathVariable long id, @RequestParam ProductRequest product){
         try{
-            ProductResponse updateProduct=productService.updateProduct( id, product, image);
+            ProductResponse updateProduct=productService.updateProduct( id, product);
             return new ResponseEntity<>(updateProduct,HttpStatus.OK);
         }catch(Exception e){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -72,28 +72,19 @@ public class SellerController {
         }
     }
 
-    @PostMapping("/{sellerId}")
-    public  ResponseEntity<?> uploadData(@PathVariable long sellerId, @RequestPart SellerDetailReq updateReq, @RequestPart MultipartFile imgFile){
-        try{
-            sellerService.setSellerDetails(sellerId, updateReq, imgFile);
-            return new ResponseEntity<>(HttpStatus.ACCEPTED);
-        }catch(Exception e){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
     @PostMapping("/{sellerId}/details")
-    public ResponseEntity<?> postSellerDetails(@PathVariable long sellerId, @RequestPart("seller") SellerDetailReq uploadReq, @RequestPart(name = "image",required = false) MultipartFile imgFile){
+    public ResponseEntity<?> postSellerDetails(@PathVariable long sellerId, @RequestParam("seller") SellerDetailReq uploadReq){
         try {
-            sellerService.setSellerDetails(sellerId, uploadReq, imgFile);
+            sellerService.setSellerDetails(sellerId, uploadReq);
             return ResponseEntity.ok("Seller details submitted");
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
     @PutMapping("/{sellerId}/details")
-    public ResponseEntity<?> putSellerDetails(@PathVariable long sellerId, @RequestPart SellerDetailReq uploadReq, @RequestPart(required = false) MultipartFile imgFile){
+    public ResponseEntity<?> putSellerDetails(@PathVariable long sellerId, @RequestParam SellerDetailReq uploadReq){
         try {
-            sellerService.setSellerDetails(sellerId, uploadReq, imgFile);
+            sellerService.setSellerDetails(sellerId, uploadReq);
             return new ResponseEntity<>(HttpStatus.ACCEPTED);
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

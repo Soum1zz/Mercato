@@ -12,6 +12,7 @@ public record ProductRequest(
         String category,
         int stock,
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-        Date date
+        Date date,
+        String imgUrl
 ) {
 }
