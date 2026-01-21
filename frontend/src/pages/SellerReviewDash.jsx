@@ -1,4 +1,4 @@
-import { data, useLocation, useNavigate } from 'react-router-dom';
+import {  useLocation, useNavigate } from 'react-router-dom';
 import '../styles/sellerReqDash.css'
 import { useEffect, useState } from 'react';
 import { getToken, isTokenExpired } from '../auth/authService';
@@ -26,7 +26,7 @@ export default function SellerReviewDash() {
   }
   if (!state?.sellerReq) {
     navigate("/admin");
-    return null;
+    // return null;
 
   }
   const { sellerReq } = state;
@@ -48,9 +48,8 @@ export default function SellerReviewDash() {
   if(!res.ok){
     throw new Error("Failed to fetch certificates");
   }
-  const blob = await res.blob();
-  const imgUrl= URL.createObjectURL(blob);
-  setCertImg(imgUrl);
+  const url= await res.text();
+  setCertImg(url);
     }catch(e){
       console.error(e);
     }
@@ -58,7 +57,7 @@ export default function SellerReviewDash() {
     
   fetchCert();
   
-  },[])
+  },[sellerReq?.userId])
   return (
     <div className='sell-div'>
       <div className="sell-det">

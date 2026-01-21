@@ -40,21 +40,6 @@ export default function SellerForm({ sellDet, onClose, user }) {
 
               const jsonData = await res.json();
               imgUrl= jsonData.secure_url;
-              try {
-                await fetch(
-                  `http://localhost:8080/api/user/${user.userId}/image`,
-                  {
-                    method: "POST",
-                    headers:{
-                        "Content-Type":"application/json",
-                        Authorization: `Bearer ${getToken()}`
-                    },
-                    body: JSON.stringify({imgUrl: imgUrl}),
-                  },
-                );
-              } catch (e) {
-                console.error(e);
-              }
 
             } catch (e) {
               console.error("Image upload failed", e);

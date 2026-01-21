@@ -61,7 +61,7 @@ export default function Authenticate() {
                 e.preventDefault();
                 const form = e.currentTarget;
                 const rawFormData = new FormData(form);
-                                console.log(rawFormData.get("name"));
+                console.log(rawFormData.get("name"));
                 if (isLogin) {
                     setLoading(true);
 
@@ -124,11 +124,11 @@ export default function Authenticate() {
                         );
                         if (response.ok) {
                             const result = await response.json();
-                            console.log("success");
                             toast.success("You have successfully logged in to Mercato");
                             saveToken(result.token);
                             const decoded = jwtDecode(result.token);
                             const role = decoded.role;
+                            console.log(role);
                             if (role === "ADMIN") { navigate("/admin") }
                             else if (role === "SELLER") { navigate("/seller") }
                             else { navigate("/customer") }

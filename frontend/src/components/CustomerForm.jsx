@@ -1,5 +1,5 @@
 
-import '../styles/customerForm.css'
+import '../styles/customer.css'
 import { getToken } from "../auth/authService";
 export default function CustomerForm({ user, isForm, setForm }) {
   const btnHandler = () => {
@@ -14,30 +14,24 @@ export default function CustomerForm({ user, isForm, setForm }) {
         e.preventDefault();
         if (!isForm) return;
         const form = e.currentTarget;
-        const rawFormData = new FormData(form);
 
         const userData = {
-          name: rawFormData.get("name"),
-          email: rawFormData.get("email"),
-          phoneNumber: rawFormData.get("number"),
-          pinCode: Number(rawFormData.get("pinCode").trim()),
-          address: rawFormData.get("address"),
+          name: form.elements.name.value,
+          email: form.elements.email.value,
+          phoneNumber: form.elements.number.value,
+          pinCode: Number(form.elements.pinCode.value.trim()),
+          address: form.elements.address.value,
         };
 
-        const dataToSend = new FormData();
-
-        dataToSend.append(
-          "user",
-          new Blob([JSON.stringify(userData)], { type: "application/json" }),
-          "user.json"
-        );
+        
 
         try{const response = await fetch("http://localhost:8080/api/me", {
           method: "PUT",
           headers: {
+            "Content-Type": "application/json",
             Authorization: `Bearer ${getToken()}`
           },
-          body: dataToSend
+          body: JSON.stringify(userData)
         });
         if(response.ok){
             alert("sucessfully updated")
@@ -77,7 +71,7 @@ export default function CustomerForm({ user, isForm, setForm }) {
           >Save Changes</button>)}
       </div>
         { isForm === false&&
-        <button className="prof-btn"  onClick={btnHandler}>Edit Profile</button>
+        <button type='button' className="prof-btn"  onClick={btnHandler}>Edit Profile</button>
         }
         </form>
 
