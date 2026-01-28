@@ -9,7 +9,7 @@
 import { useEffect, useState } from "react"
 import ProductCard from "../components/ProductCard";
 import "../styles/products.css"
-import { data, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Loader  from "../components/Loader"
 export default function Products() {
     const location = useLocation();
