@@ -1,0 +1,18 @@
+.order-det-div{
+    width: 80vw;
+    height: min-content;
+    margin: 0 auto;
+    margin-top: 3rem;
+    padding: 5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content:space-around;
+    font-size: 25px;
+    color: rgba(60, 61, 61, 0.877);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.total-price{
+    text-align: right;
+    color: #6b1d4d;
+}

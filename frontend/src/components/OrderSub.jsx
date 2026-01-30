@@ -1,15 +1,28 @@
-export default function OrderSub(){
+
+import { useNavigate } from "react-router-dom"
+
+export default function OrderSub({order}){
+    const navigate= useNavigate()
+    const viewOrderHandler= ()=>{
+        navigate(`/order-detail/${order.id}`, 
+            {
+            state: order
+            }
+        )
+    }
     return(
         <div className="order-row order-data">
-            <span>id</span>
-            <span>date</span>
+            <span>{order.id}</span>
+            <span>{order.date}</span>
 
             <span className="status">
-                status
+                {order.status}
             </span>
 
-            <span>total</span>
-            <button className="view-btn">View Order</button>
+            <span>₹{order.totalPrice}</span>
+            <button className="view-btn"
+            onClick={viewOrderHandler}
+            >View Order</button>
         </div>
     )
 }

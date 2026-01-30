@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import {BrowserRouter, Routes, Route, useLocation} from "react-router-dom"
+import {BrowserRouter, Routes, Route} from "react-router-dom"
 import './App.css'
 import Navbar from './components/Navbar'
 import Home from './pages/Home'
@@ -13,6 +13,7 @@ import AdminDash from './pages/AdminDash'
 import SellerReviewDash from './pages/SellerReviewDash'
 import SellerDash from './pages/SellerDash'
 import ProtectedRoute from './auth/ProtectedRoute'
+import OrderDetail from './pages/OrderDetail'
 import { Toaster } from 'react-hot-toast'
 function App() {
   const [theme, setTheme]=  useState ("light");
@@ -45,7 +46,7 @@ function App() {
           <Route path='/admin' element={<ProtectedRoute><AdminDash /></ProtectedRoute> } />
           <Route path='/seller' element={<ProtectedRoute><SellerDash /></ProtectedRoute> } />
           <Route path='/add-product' element={<ProtectedRoute><ProductForm/></ProtectedRoute> } />
-
+          <Route path='/order-detail/:id' element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
         </Routes>
        
       
