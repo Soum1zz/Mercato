@@ -2,28 +2,66 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom"
 import { FaMinus, FaPlus } from "react-icons/fa6";
 import { GoArrowDown, GoHeart, GoHeartFill } from "react-icons/go";
+import { IoStar,IoStarHalf,IoStarOutline } from "react-icons/io5";
+import { FiUpload } from "react-icons/fi";
 
 import '../styles/productDetail.css'
 import { getCurrentUser, getToken } from "../auth/authService";
 import toast from "react-hot-toast";
+import CommentBody from "../components/CommentBody";
 export default function ProductDetail() {
     const { id } = useParams();
     const [product, setProduct] = useState(null);
     const [edit, setEdit] = useState(false);
     const [Comments, setcomments] = useState([]);
-    const [Comment, setcomment] = useState();
+    const [yourReview, setYourReview] = useState("");
+    const [showReviewBox, setShowReviewBox] = useState(false);
+    const [rating, setRating] = useState(null);
+    const [yourRating, setYourRating] = useState(0);
+    const [yourCommentData, setYourCommentData] = useState(null);
     const [count, setCount] = useState(1);
     const [isWishlisted, setWishlisted] = useState(false);
+    const [imgPreview, setImgPreview] = useState(null)
     const navigate = useNavigate();
+
     const categories = [
         "Electronics", "Fashion", "Home & Living",
         "Beauty & Personal Care", "Books"
     ];
+    useEffect(()=>{
+        const fetchOwnComment= async ()=>{
+            if(!getCurrentUser())return;
+            const res= await fetch(`http://localhost:8080/api/product/${id}/user/comment`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${getToken()}`,
+                        },
+                    }
+            );
+            if (res.status === 404) return; // user never reviewed
+
+            if(!res.ok){
+                console.error(res.status);
+                toast.error("Cant fetch your comment");
+            }
+            const comData= await res.json();
+            setYourCommentData(comData);
+            setYourReview(comData.desc);
+            setYourRating(comData.rating);
+            setImgPreview(comData.imgUrl)
+
+        }
+        fetchOwnComment();
+    },[id])
     useEffect(() => {
         const fetchProduct = async () => {
             const response = await fetch(`http://localhost:8080/api/product/${id}`);
             const data = await response.json();
             setProduct(data);
+
+            const ratRes= await fetch(`http://localhost:8080/api/product/${id}/rating`);
+            const ratData = await ratRes.json();
+            setRating(ratData);
 
             const comRes = await fetch(`http://localhost:8080/api/product/${id}/comments`);
             const comData = await comRes.json();
@@ -32,6 +70,14 @@ export default function ProductDetail() {
 
         fetchProduct();
     }, [id]);
+    let fullStars=0;
+    let hasHalfStar=false;
+    let emptyStars=5;
+    if(rating && rating.rating != null)
+    { 
+    fullStars = Math.floor(rating.rating);
+    hasHalfStar = rating.rating % 1 >=0.1
+    emptyStars = 5 - fullStars - (hasHalfStar? 1 : 0)}
 
     useEffect(() => {
         const fetchWishlistStatus = async () => {
@@ -59,6 +105,87 @@ export default function ProductDetail() {
         }
         fetchWishlistStatus();
     }, [product?.id]);
+
+
+    const imgUploadHandler= async(e)=>{
+    const file = e.target.files[0];
+    if (!file) return;
+    const data = new FormData();
+    data.append("file", file);
+    data.append("upload_preset", "Mercato");
+    data.append("cloud_name", "dp5zhfxsl");
+
+    try {
+      const res = await fetch(
+        "https://api.cloudinary.com/v1_1/dp5zhfxsl/image/upload",
+        {
+          method: "POST",
+          body: data,
+        },
+      );
+
+      const jsonData = await res.json();
+      console.log(jsonData);
+
+      setImgPreview(jsonData.secure_url);
+    } catch (e) {
+      console.error("Image upload failed", e);
+    }
+  };
+    
+    const submitHandler= async(e)=>{e.preventDefault();
+        const form = e.currentTarget;
+        const rawFormData = new FormData(form);
+        if(!getCurrentUser()){navigate("/auth");return;}
+        const CommentData = {
+            desc:rawFormData.get("desc"),
+            rating:yourRating,
+            imgUrl:imgPreview
+          };
+          try {
+            const response = await fetch(
+              `http://localhost:8080/api/product/${product.id}/comments`,
+              {
+                method: "POST",
+                headers: {
+                 "Content-Type": "application/json",
+                  Authorization: `Bearer ${getToken()}`,
+                },
+                body: JSON.stringify(CommentData),
+              },
+            );
+
+            if (response.ok) {
+              const result = await response.json();
+              console.log("Success:", result);
+              toast.success("Comment added!");
+              setShowReviewBox(false);
+              setYourRating(0);
+              setYourReview("");
+              const ratRes = await fetch(`http://localhost:8080/api/product/${product.id}/rating`);
+              const ratData = await ratRes.json();
+              setRating(ratData);
+
+              const comRes= await fetch(`http://localhost:8080/api/product/${product.id}/comments`);
+              const comData= await comRes.json();
+              setcomments(comData)
+
+            } else {
+              const errorText = await response.text();
+              console.error(
+                "Server Error Status:",
+                response.status,
+                "Message:",
+                errorText,
+              );
+              toast.error("Comment not added!");
+            }
+          } catch (e) {
+            console.error("Network Error:", e);
+          }
+        }
+
+    
 
     const wishlistHandler = async () => {
         try {
@@ -112,7 +239,6 @@ export default function ProductDetail() {
                 throw new Error("Failed adding to cart")
             }
             toast.success("Added to cart");
-            const data = await res.json();
         } catch (e) {
             console.error(e);
         }
@@ -145,7 +271,6 @@ export default function ProductDetail() {
                 throw new Error("Failed to order")
             }
             toast.success("Congratulations you have successfully ordered!");
-            const data = await res.json();
         } catch (e) {
             console.error(e);
         }
@@ -220,7 +345,8 @@ export default function ProductDetail() {
                     </label><br />
                     <label>Product Price:
                         <input type="number" name="price" step="0.01" min="0" defaultValue={product.price} required />
-                    </label><br />
+                    </label>
+                    <br />
                     <label>Product Brand:
                         <input type="text" name="brand" defaultValue={product.brand} required />
                     </label><br />
@@ -273,13 +399,77 @@ export default function ProductDetail() {
     }
     return (<div className="prod-det-div">
         <div className="prod-det-left">
-            <img src={imageUrl} />
+            <img src={imageUrl} className="prod-img" />
             <div className="heart"
                 onClick={wishlistHandler}
             >
                 {
                     !isWishlisted ? <GoHeart /> : <GoHeartFill />
                 }
+            </div>
+
+
+            <div>
+                <h2>Your Review:</h2>
+                {
+                   !showReviewBox&&yourCommentData&&
+                    <CommentBody comment={yourCommentData}/>
+                }
+                <button className="comment-btn"
+                onClick={()=>{
+                    if(!getCurrentUser()) {navigate("/auth"); return;}
+                    setShowReviewBox(true)}}
+                >{
+                    yourCommentData==null?
+                    ("Write a review"):("Edit your review")}</button>
+
+                {
+                    showReviewBox&&(
+                        <form className="review-modal"
+                        onSubmit={submitHandler}>
+                            <h3>Your review:</h3>
+
+                            <div className="star-select">
+                                {
+                                    [1,2,3,4,5].map(n=>(
+                                        <IoStar
+                                        key={n}
+                                        className={n<=yourRating?"active-star":""}
+                                        onClick={()=>setYourRating(n)}
+                                        />
+                                    ))
+                                }
+                            </div>
+
+                            {
+                            imgPreview?
+                            (<img src={imgPreview}></img>):
+                            (<label 
+                            className="upload-img-div"
+                            >
+                                upload image <FiUpload/>
+                                <input type="file" hidden onChange={imgUploadHandler}/>
+                            </label>)}<br/>
+                            <textarea
+                            style={{width:"400px", padding:"1rem"}}
+                            placeholder="Share your experience..."
+                            value={yourReview}
+                            name="desc"
+                            onChange={(e)=>setYourReview(e.target.value)}
+                            />
+
+                            <div className="review-actions">
+                                <button type="submit"
+                                >Submit</button>
+                                <button type="button"
+                                onClick={()=>setShowReviewBox(false)}
+                                >Cancel</button>
+
+                            </div>
+                        </form>
+                    )
+                }
+                
             </div>
         </div>
 
@@ -289,6 +479,29 @@ export default function ProductDetail() {
 
             <div style={{ fontSize: "43px", fontWeight: "900", color: '#6b1d4d' }}>₹ {product.price}</div>
             {/* Rating Logic*/}
+            <div style={{fontSize: "25px"}}>Rating: </div>
+            {rating != null ? (<div className="stars">
+                 {
+                    [...Array(fullStars)].map((_,i)=>(
+                        <span key={"f"+i}><IoStar/></span>
+                    ))
+                 }
+                 {
+                 hasHalfStar&& <span><IoStarHalf/></span>
+                 }
+                 {
+                    [...Array(emptyStars)].map((_,i)=>(
+                        <span key={"e"+i}><IoStarOutline/></span>
+                    ))
+                 }
+                 <span className="rating-number">{rating.rating}</span>
+                 <span className="rating-number">({rating.totalRatings})</span>
+
+            </div>):
+            (
+                <div style={{fontSize: "15px"}}>(No ratings yet)</div>
+            )
+            }
             <div>{product.description}</div>
 
             <div style={{ fontSize: "30px" }}>Quantity</div>
@@ -314,7 +527,20 @@ export default function ProductDetail() {
             </div>
 
 
-            <div><h2>Comments:</h2>
+            <div>
+                <h2>Customer Reviews:</h2>
+
+                
+                {
+                    Comments.length==0?
+                    (<div>No Comments yet</div>):
+                    (<div>
+                        {
+                          Comments.map((comment)=>(
+                         <CommentBody key={comment.id} comment={comment}/>))
+                        }
+                    </div>)
+                }
 
             </div>
         </div>
