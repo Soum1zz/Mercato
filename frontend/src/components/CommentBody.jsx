@@ -1,12 +1,22 @@
+import { useState } from "react";
 import { IoStar } from "react-icons/io5";
 
 
 export default function CommentBody({ comment }) {
-  const cusImg= `http://localhost:8080/api/user/${comment.userId}/image`
+  const name= comment.userName?.charAt(0).toUpperCase()||"";
+
+  const [imgError, setImgError]= useState(false);
+  const cusImg= `http://localhost:8080/api/user/${comment.userId}/image`;
   return (
     <div className="comments-div">
       <div style={{display:"flex", gap:"2rem", alignItems:"center"}}>
-        <img src={cusImg} alt="img" className="com-dp" />
+        {
+          !imgError?
+        (<img src={cusImg}  className="com-dp"  onError={()=> setImgError(true)}/>)
+        :(<div
+        className="com-dp"
+        >{name}</div>)
+        }
         <div>
           <div style={{fontSize:"30px", fontWeight:"bolder"}}>{comment.userName}</div>
             <div className="star-select">

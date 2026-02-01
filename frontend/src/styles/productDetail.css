@@ -133,6 +133,10 @@
     border-radius: 50px;
     background: #c970a7;
     border: none;
-    object-fit: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    /* object-fit: cover; */
 
 }

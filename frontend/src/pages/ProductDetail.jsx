@@ -4,7 +4,7 @@ import { FaMinus, FaPlus } from "react-icons/fa6";
 import { GoArrowDown, GoHeart, GoHeartFill } from "react-icons/go";
 import { IoStar,IoStarHalf,IoStarOutline } from "react-icons/io5";
 import { FiUpload } from "react-icons/fi";
-
+import Loader from "../components/Loader";
 import '../styles/productDetail.css'
 import { getCurrentUser, getToken } from "../auth/authService";
 import toast from "react-hot-toast";
@@ -277,7 +277,7 @@ export default function ProductDetail() {
 
     }
     const imageUrl = `http://localhost:8080/api/product/${id}/image`
-    if (!product) return <p>Loading Product</p>
+    if (!product) return <Loader/>
 
     if (edit) {
         return (

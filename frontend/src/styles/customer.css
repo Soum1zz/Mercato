@@ -32,7 +32,11 @@
     align-items: center;
     flex-direction: column;
 }
-.customer-img img{
+.customer-img img, .customer-img-fallback{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 90px;
     width: 8rem;
     height: 8rem;
     border-radius: 50%;

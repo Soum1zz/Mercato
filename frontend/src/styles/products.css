@@ -28,16 +28,21 @@
     color: white;
 }
 .prod-right{
+    display: flex;
+    flex-direction: column;
+    
     height: min-content;
     width: 65vw;
     border: 1px solid rgba(0, 0, 0, 0.3);
     padding: 2rem;
 }
 .all-prods{
+    display: flex;
     padding: 2rem;
     display: flex;
     flex-wrap: wrap;
-    gap: 2rem;
+    gap: 8rem;
+    justify-content: center;
     align-items: center;
     
 }

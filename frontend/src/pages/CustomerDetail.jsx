@@ -105,15 +105,31 @@ export default function CustomerDetail() {
   let Name = "";
   if (userName.length > 18) Name = userName.substring(0, 18) + "...";
   else Name = userName;
+  const name = userName?.charAt(0).toUpperCase() || "";
+
+  const [imgError, setImgError] = useState(false);
+
   return (
     <div className="customer-div">
       <div className="customer-nav">
         <div className="customer-img">
-          <img src={preview} alt={user?.name} />
-
-          <div className="cam-icon" onClick={handleClick}>
-            <FaCamera />
+          {!imgError ? (
+            <div>
+              
+              <img
+                src={preview}
+                alt={user?.name}
+                onError={() => setImgError(true)}
+              />
+            
           </div>
+          ) : (
+            <div className="customer-img-fallback">{name}</div>
+          )}
+          <div className="cam-icon" onClick={handleClick}>
+                <FaCamera />
+              </div>
+          
 
           <input
             type="file"
