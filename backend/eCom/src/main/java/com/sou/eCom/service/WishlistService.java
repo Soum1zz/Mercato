@@ -64,8 +64,6 @@ public class WishlistService {
                     product.getCategory(),
                     product.getStock(),
                     product.getStatus().toString(),
-                    product.getImageName(),
-                    product.getImageType(),
                     product.getSeller().getUserId()
             );
             productResponses.add(response);

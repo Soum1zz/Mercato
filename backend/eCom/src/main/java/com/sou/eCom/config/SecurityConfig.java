@@ -48,7 +48,15 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(customizer -> customizer.disable())
         .authorizeHttpRequests(requests -> requests
-                .requestMatchers("/register", "/auth/**","/api/user/*/image","/api/product/**").permitAll()
+                .requestMatchers(
+                        "/register",
+                        "/auth/**",
+                        "/api/user/*/image",
+                        "/api/product/**",
+                        "/api/request-otp",   // ✅ ADD THIS
+                        "/api/verify-otp",
+                        "/api/link-req",
+                        "/api/reset-password").permitAll()
                 .anyRequest().authenticated())
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
@@ -67,7 +75,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuration.setAllowedOrigins(List.of("http://localhost:5173",
+                                                "https://soum1zz.github.io"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
 

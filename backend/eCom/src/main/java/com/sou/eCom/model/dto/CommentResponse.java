@@ -9,7 +9,7 @@ public record CommentResponse(
         LocalDate creationDate,
         String desc,
         double rating,
-
+        String imageUrl,
         long userId,
         String userName
 ) {

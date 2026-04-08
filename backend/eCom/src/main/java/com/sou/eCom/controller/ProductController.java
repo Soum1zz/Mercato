@@ -3,7 +3,10 @@ package com.sou.eCom.controller;
 import com.sou.eCom.model.Product;
 import com.sou.eCom.model.dto.ProductRequest;
 import com.sou.eCom.model.dto.ProductResponse;
+import com.sou.eCom.model.dto.RatingResponse;
+import com.sou.eCom.repo.CommentRepo;
 import com.sou.eCom.repo.ProductRepo;
+import com.sou.eCom.service.CommentService;
 import com.sou.eCom.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -19,6 +23,8 @@ import java.util.List;
 public class ProductController {
     @Autowired
     ProductService productService;
+    @Autowired
+    CommentService commentService;
     @GetMapping("/product")
     public ResponseEntity<List<ProductResponse>> products()
     {
@@ -31,12 +37,12 @@ public class ProductController {
         return  new ResponseEntity<>(productService.getProduct(id), HttpStatus.OK);
     }
     @GetMapping("/product/{id}/image")
-    public ResponseEntity<String> getImage(@PathVariable long id){
-        ProductResponse product = productService.getProduct(id);
-        String img = productService.getImage(id);
-        return ResponseEntity.ok()
-                .body(img);
-
+    public ResponseEntity<Void> getImage(@PathVariable long id){
+        String imgUrl = productService.getImage(id);
+        return ResponseEntity
+                .status(HttpStatus.FOUND)
+                .location(URI.create(imgUrl))
+                .build();
     }
     @GetMapping("/product/search")
     public ResponseEntity<List<ProductResponse>> searchProduct(
@@ -50,5 +56,13 @@ public class ProductController {
        return new ResponseEntity<>( productService.findByCategory(category), HttpStatus.OK);
     }
 
+    @GetMapping("/product/{productId}/rating")
+    public ResponseEntity<RatingResponse> productsByRating(@PathVariable("productId") long productId){
+        try{
+            return new ResponseEntity<>(commentService.getRating(productId),HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
     
 }

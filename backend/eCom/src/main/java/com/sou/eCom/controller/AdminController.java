@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -34,22 +35,24 @@ public class AdminController {
     }
 
     @GetMapping("/user/{userId}/image")
-    public ResponseEntity<String> getImage(@PathVariable("userId") Long userId){
-        try{
-            return userService.getImage(userId);
-        }catch (Exception e){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<?> getImage(@PathVariable("userId") Long userId){
+        String imgUrl=userService.getImage(userId);
+        if(imgUrl==null || imgUrl.isBlank()){
+            return ResponseEntity.notFound().build();
         }
+        return new ResponseEntity<>(imgUrl, HttpStatus.OK) ;
     }
+
     @GetMapping("/seller/{sellerId}/certificate")
-    public ResponseEntity<?> getCertiImage(@PathVariable("sellerId") Long userId){
-        try{
-            String img= sellerService.getCertificateImage(userId);
-            return  ResponseEntity.ok()
-                    .body(img) ;
-        }catch (Exception e){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<String> getCertImage(@PathVariable("sellerId") long userId) {
+
+            String imgUrl = sellerService.getCertificateImage(userId);
+            if(imgUrl==null || imgUrl.isBlank()){
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity
+                    .ok(imgUrl);
+
     }
 
 

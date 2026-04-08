@@ -5,9 +5,12 @@ import com.sou.eCom.model.Comment;
 import com.sou.eCom.model.dto.CommentRequest;
 import com.sou.eCom.model.dto.CommentResponse;
 import com.sou.eCom.service.CommentService;
+import com.sou.eCom.security.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,6 +30,17 @@ public class CommentController {
         return commentService.getProductComments(productId);
     }
 
+    @GetMapping("/product/{productId}/user/comment")
+    public ResponseEntity<?> getComments(@PathVariable Long productId, @AuthenticationPrincipal UserPrincipal userPrincipal)  {
+
+        try{
+            return new ResponseEntity<>(commentService.getUserCommentOnProduct( userPrincipal.getUser().getUserId(), productId),HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+
+    }
     @GetMapping("/comments/{commentId}")
     public CommentResponse getComment(@PathVariable Long commentId) throws IOException {
         return commentService.getComment(commentId);
@@ -45,18 +59,18 @@ public class CommentController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR) ;
         }
     }
-
+    @PreAuthorize("hasRole('USER')")
     @PostMapping("/product/{productId}/comments")
-    public ResponseEntity<CommentResponse> save(@PathVariable long productId , @RequestParam CommentRequest commentRequest ) {
+    public ResponseEntity<CommentResponse> save(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable long productId , @RequestBody CommentRequest commentRequest ) {
         try {
-            return new ResponseEntity<>(commentService.addComment(productId, commentRequest), HttpStatus.CREATED);
+            return new ResponseEntity<>(commentService.addComment(userPrincipal.getUser().getUserId(),productId, commentRequest), HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-
+    @PreAuthorize("hasRole('USER')")
     @PutMapping("/comment/{commentId}")
-    public ResponseEntity<CommentResponse> update(@PathVariable long commentId ,@RequestParam CommentRequest commentRequest ) {
+    public ResponseEntity<CommentResponse> update(@PathVariable long commentId ,@RequestBody CommentRequest commentRequest ) {
         try {
             return new ResponseEntity<>(commentService.updateComment(commentId, commentRequest), HttpStatus.CREATED);
         } catch (Exception e) {

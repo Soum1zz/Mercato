@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "https://localhost:5173")
@@ -42,13 +44,17 @@ public class UserController {
         return new ResponseEntity<>(userService.getUser(principal.getUser().getUserId()), HttpStatus.OK );
     }
     @GetMapping("/user/{userId}/image")
-    public ResponseEntity<String> getCurrentUserImage(@PathVariable long userId) {
-        return userService.getImage(userId);
+    public ResponseEntity<Void> getCurrentUserImage(@PathVariable long userId) {
+        String imgUrl= userService.getImage(userId);
+        return ResponseEntity
+                .status(HttpStatus.FOUND)
+                .location(URI.create(imgUrl))
+                .build();
     }
     @PutMapping("/user/{userId}/image")
-    public ResponseEntity<?> putCurrentUserImage(@PathVariable long userId, @RequestParam String imageUrl) {
+    public ResponseEntity<?> putCurrentUserImage(@PathVariable long userId, @RequestBody Map<String,String> body) {
         try {
-            userService.putImage(userId, imageUrl);
+            userService.putImage(userId, body.get("imgUrl"));
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
 
@@ -68,7 +74,7 @@ public class UserController {
 
 
     @PutMapping("/me")
-    public  ResponseEntity<UserResponse> updateUser(@AuthenticationPrincipal UserPrincipal principal, @RequestParam UserRequest user )throws IOException {
+    public  ResponseEntity<UserResponse> updateUser(@AuthenticationPrincipal UserPrincipal principal, @RequestBody UserRequest user )throws IOException {
         return new ResponseEntity<>(userService.updateUser(user,principal.getUser().getUserId()),HttpStatus.OK);
     }
 

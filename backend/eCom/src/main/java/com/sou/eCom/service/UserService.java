@@ -132,6 +132,7 @@ public class UserService {
                     comment.getCreatedDate(),
                     comment.getCommentBody(),
                     comment.getRating(),
+                    comment.getImageUrl(),
                     comment.getUser().getUserId(),
                     comment.getUser().getUserName()
             ));
@@ -140,13 +141,14 @@ public class UserService {
         return commentResponses;
     }
 
-    public ResponseEntity<String> getImage(Long userId) {
+    public String getImage(Long userId) {
         User user= userRepo.findById(userId).orElseThrow(()->new RuntimeException("User not found"));
-        return ResponseEntity.ok()
-                .body(user.getImageUrl());
+        return user.getImageUrl();
     }
     @Transactional
     public void putImage(Long userId, String imageUrl) {
+        if(imageUrl==null || imageUrl.isEmpty()) return;
+        imageUrl=imageUrl.replace("\"","");
         User user= userRepo.findById(userId).orElseThrow(()->new RuntimeException("User not found"));
         user.setImageUrl(imageUrl);
     }

@@ -5,6 +5,7 @@ import com.sou.eCom.model.Product;
 import com.sou.eCom.model.User;
 import com.sou.eCom.model.dto.CommentRequest;
 import com.sou.eCom.model.dto.CommentResponse;
+import com.sou.eCom.model.dto.RatingResponse;
 import com.sou.eCom.repo.CommentRepo;
 import com.sou.eCom.repo.ProductRepo;
 import com.sou.eCom.repo.UserRepo;
@@ -26,10 +27,10 @@ public class CommentService {
     @Autowired
     private ProductRepo productRepo;
 
-    public CommentResponse addComment(long productId, CommentRequest commentRequest) throws IOException {
+    public CommentResponse addComment(long uId ,long productId, CommentRequest commentRequest) throws IOException {
         Comment comment = new Comment();
         Product product = productRepo.findById(productId).orElseThrow(()->new RuntimeException("product not found"));
-        User user =userRepo.findByUserId(commentRequest.userId()).orElseThrow(()->new RuntimeException("user not found"));
+        User user =userRepo.findByUserId(uId).orElseThrow(()->new RuntimeException("user not found"));
 
 
 
@@ -68,6 +69,7 @@ public class CommentService {
                 oldComment.getCreatedDate(),
                 oldComment.getCommentBody(),
                 oldComment.getRating(),
+                oldComment.getImageUrl(),
                 oldComment.getUser().getUserId(),
                 oldComment.getUser().getUserName()
 
@@ -110,5 +112,18 @@ public class CommentService {
     public String getImg(Long commentId) {
         Comment comment=commentRepo.findById(commentId).orElseThrow(()->new RuntimeException("comment not found"));
         return comment.getImageUrl();
+    }
+
+    public RatingResponse getRating(long productId) {
+        double rating= commentRepo.getRating(productId);
+        long totalRating= commentRepo.getTotalRating(productId);
+
+        return new RatingResponse(rating,totalRating);
+    }
+
+    public CommentResponse getUserCommentOnProduct(Long userId, Long productId) throws IOException {
+        Comment comment= commentRepo.findByUserUserIdAndProductId(userId, productId)
+                .orElseThrow(()->new RuntimeException("Comment does not exist"));
+        return toCommentResponse(comment);
     }
 }

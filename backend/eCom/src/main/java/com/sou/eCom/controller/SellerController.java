@@ -36,8 +36,8 @@ public class SellerController {
             throw new RuntimeException(e);
         }
     }
-    @PostMapping(value = "/products", consumes = "multipart/form-data")
-    public ResponseEntity<?> createProduct(@RequestParam ProductRequest request){
+    @PostMapping(value = "/products")
+    public ResponseEntity<?> createProduct(@RequestBody ProductRequest request){
         try{
             Authentication auth =
                     SecurityContextHolder.getContext().getAuthentication();
@@ -53,7 +53,7 @@ public class SellerController {
     }
 
     @PutMapping("/product/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable long id, @RequestParam ProductRequest product){
+    public ResponseEntity<?> updateProduct(@PathVariable long id, @RequestBody ProductRequest product){
         try{
             ProductResponse updateProduct=productService.updateProduct( id, product);
             return new ResponseEntity<>(updateProduct,HttpStatus.OK);
@@ -73,7 +73,7 @@ public class SellerController {
     }
 
     @PostMapping("/{sellerId}/details")
-    public ResponseEntity<?> postSellerDetails(@PathVariable long sellerId, @RequestParam("seller") SellerDetailReq uploadReq){
+    public ResponseEntity<?> postSellerDetails(@PathVariable long sellerId, @RequestBody SellerDetailReq uploadReq){
         try {
             sellerService.setSellerDetails(sellerId, uploadReq);
             return ResponseEntity.ok("Seller details submitted");
@@ -82,7 +82,7 @@ public class SellerController {
         }
     }
     @PutMapping("/{sellerId}/details")
-    public ResponseEntity<?> putSellerDetails(@PathVariable long sellerId, @RequestParam SellerDetailReq uploadReq){
+    public ResponseEntity<?> putSellerDetails(@PathVariable long sellerId, @RequestBody SellerDetailReq uploadReq){
         try {
             sellerService.setSellerDetails(sellerId, uploadReq);
             return new ResponseEntity<>(HttpStatus.ACCEPTED);
