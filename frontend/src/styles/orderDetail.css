@@ -1,5 +1,5 @@
 .order-det-div{
-    width: 80vw;
+    width: min(80vw, 1200px);
     height: min-content;
     margin: 0 auto;
     margin-top: 3rem;
@@ -15,4 +15,23 @@
 .total-price{
     text-align: right;
     color: #6b1d4d;
+}
+
+@media (max-width: 1024px) {
+    .order-det-div {
+        width: calc(100% - 3rem);
+        padding: 3rem 2rem;
+    }
+}
+
+@media (max-width: 760px) {
+    .order-det-div {
+        width: calc(100% - 2rem);
+        padding: 1.5rem;
+        font-size: 20px;
+    }
+
+    .total-price {
+        text-align: left;
+    }
 }

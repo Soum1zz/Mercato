@@ -39,3 +39,17 @@
     background: #5a173f;
     box-shadow: 3px 3px gray;
 }
+
+@media (max-width: 760px) {
+    .prod-card {
+        width: min(100%, 280px);
+        height: auto;
+        min-height: 360px;
+    }
+
+    .prod-btn {
+        width: 100%;
+        max-width: 180px;
+        font-size: 18px;
+    }
+}

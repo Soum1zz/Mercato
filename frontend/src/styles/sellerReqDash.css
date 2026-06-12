@@ -1,5 +1,5 @@
 .sell-div{
-    width: 70vw;
+    width: min(70vw, 1050px);
     margin: 0 auto;
     height: min-content;
     padding: 5rem;
@@ -33,10 +33,10 @@
 }
 .sell-det{
 
-    transform: translateX(30%);
     display: flex;
     width: 100%;
     align-items: center;
+    justify-content: center;
     gap: 10rem;
 }
 .acc-btn:hover{
@@ -64,4 +64,42 @@
     justify-content: center;
     align-items: center;
     gap: 2rem;
+}
+
+@media (max-width: 1024px) {
+    .sell-div {
+        width: calc(100% - 3rem);
+        padding: 3rem 2rem;
+    }
+
+    .sell-det {
+        gap: 3rem;
+    }
+}
+
+@media (max-width: 760px) {
+    .sell-div {
+        width: calc(100% - 2rem);
+        padding: 1.5rem;
+        font-size: 20px;
+    }
+
+    .sell-det,
+    .sell-doc,
+    .acc-btn-grp {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.25rem;
+    }
+
+    .sell-img {
+        align-self: center;
+        width: 150px;
+        height: 150px;
+    }
+
+    .acc-btn,
+    .view-btn {
+        width: 100%;
+    }
 }

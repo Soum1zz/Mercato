@@ -1,5 +1,5 @@
 .admin-div{
-    width: 80vw;
+    width: min(80vw, 1200px);
     height: min-content;
     margin: 0 auto;
     margin-top: 3rem;
@@ -16,9 +16,12 @@
     display: flex;
     width: 95%;
     justify-content: space-around;
+    gap: 1rem;
+    flex-wrap: wrap;
 }
 .stat-sub{
     width: 300px;
+    min-height: 120px;
     color: rgb(255, 255, 255);
     display: flex;
     justify-content: center;
@@ -54,4 +57,46 @@
     background: #5a173f;
     transform: translateX(1px) translatey(1px);
     box-shadow: 3px 3px gray;
+}
+
+@media (max-width: 1024px) {
+    .admin-div {
+        width: calc(100% - 3rem);
+        padding: 3rem 2rem;
+    }
+
+    .req-div {
+        width: 100%;
+    }
+}
+
+@media (max-width: 760px) {
+    .admin-div {
+        width: calc(100% - 2rem);
+        padding: 1.5rem;
+        font-size: 20px;
+    }
+
+    .stat-div {
+        width: 100%;
+    }
+
+    .stat-sub {
+        width: 100%;
+    }
+
+    .req-div {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.25rem;
+    }
+
+    .req-name {
+        font-size: 24px;
+    }
+
+    .req-btn {
+        width: 100%;
+    }
 }

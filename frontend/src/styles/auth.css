@@ -1,12 +1,13 @@
 .auth-div{
     position: relative;
-    transform: translateX(30vw) translateY(3vw);
+    margin: 3vw auto;
     padding: 2.5rem;
     display: flex;
     justify-content: center;
     align-items: center;
     height: min-content;
     width: 40vw;
+    max-width: 640px;
     box-shadow: 2px 5px 10px rgba(0, 0, 0, 0.4);
     border-radius: 10px;
 }
@@ -47,6 +48,7 @@
     background: #f5f5f5;
     padding: 1rem;
     width: 300px;
+    max-width: 100%;
     text-align: center;
     border: none;
     border-radius: 10px;
@@ -141,4 +143,64 @@
   text-align: center;
   border: 1px solid #ccc;
   border-radius: 8px;
+}
+
+@media (max-width: 1024px) {
+    .auth-div {
+        width: min(70vw, 640px);
+    }
+}
+
+@media (max-width: 760px) {
+    .auth-div {
+        width: calc(100% - 2rem);
+        margin: 5rem auto 2rem;
+        padding: 1.5rem;
+    }
+
+    .back-btn {
+        top: 1rem;
+        left: 1rem;
+        font-size: 18px;
+    }
+
+    .form-grid {
+        width: 100%;
+        font-size: 20px;
+    }
+
+    .form-group,
+    .auth-div form,
+    .email-div {
+        width: 100%;
+    }
+
+    .auth-div form label:not(.auth-radio) {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .auth-div form input:not([type="radio"]) {
+        width: 100%;
+    }
+
+    .eye-btn {
+        right: 0.5rem;
+    }
+
+    .pass-warn,
+    .pass-instr {
+        position: static;
+        transform: none;
+    }
+
+    .otp-box {
+        gap: 6px;
+    }
+
+    .otp-input {
+        width: 44px;
+        height: 48px;
+    }
 }

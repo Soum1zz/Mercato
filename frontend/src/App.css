@@ -7,9 +7,17 @@ body{
     /* overflow-y : hidden; */
 }
 
+* {
+    box-sizing: border-box;
+}
+
+img {
+    max-width: 100%;
+}
+
 .wrapper{
 
-    width: 100vw;
+    width: 100%;
     min-height: 100vh;
     color: #111827;
     /* transform: translateX(5%); */

@@ -75,10 +75,7 @@ export default function CustomerForm({ user, isForm, setForm }) {
         }
         </form>
 
-    <p style={{
-      transform: "translateX(40%)",
-      color: " rgba(20, 9, 37, 0.521)"
-    }}>Change your password</p>
+    <p className="password-change-text">Change your password</p>
   </div>)
 }
 

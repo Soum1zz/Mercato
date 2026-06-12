@@ -1,5 +1,5 @@
 .cart-div {
-  width: 80vw;
+  width: min(80vw, 1200px);
   height: min-content;
   margin: 0 auto;
   margin-top: 3rem;
@@ -13,7 +13,7 @@
   border: 1px solid rgba(0, 0, 0, 0.3);
 }
 .no-cart {
-  width: 50%;
+  width: min(50%, 760px);
   padding: 7rem;
 
   justify-content: center;
@@ -45,7 +45,7 @@
   box-shadow: 3px 3px gray;
 }
 .order-btn{
-    transform: translateX(35vw);
+    align-self: flex-end;
     width:200px;
     padding: 1rem;
     color: aliceblue;
@@ -54,5 +54,60 @@
     border: none;
     font-size: 20px;
     cursor: pointer;
+}
+
+@media (max-width: 1024px) {
+  .cart-div {
+    width: calc(100% - 3rem);
+    padding: 2rem;
+    font-size: 22px;
+  }
+
+  .cart-sub-div {
+    width: 100%;
+  }
+
+  .no-cart {
+    width: calc(100% - 3rem);
+    padding: 3rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .cart-div {
+    width: calc(100% - 2rem);
+    margin-top: 1.5rem;
+    padding: 1.25rem;
+    font-size: 18px;
+  }
+
+  .cart-sub-div {
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .cart-sub-div img {
+    width: 82px;
+  }
+
+  .cart-sub-div > div:nth-child(2) {
+    width: calc(100% - 100px) !important;
+    font-size: 22px !important;
+  }
+
+  .cart-sub-div > div:nth-child(3) {
+    width: auto !important;
+    margin-left: 98px;
+  }
+
+  .order-btn {
+    width: 100%;
+  }
+
+  .no-cart {
+    padding: 1.5rem;
+  }
 }
 

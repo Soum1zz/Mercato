@@ -1,5 +1,5 @@
 .add-form-div{
-    width: 60vw;
+    width: min(60vw, 860px);
     height: min-content;
     margin: 0 auto;
     margin-top: 3rem;
@@ -16,14 +16,18 @@
 .add-form{
     display: flex;
     flex-direction: column;
+    width: 100%;
+    max-width: 560px;
+    gap: 1rem;
 }
 .add-form input{
     margin-left: 1.9rem;
     width: 400px;
+    max-width: 100%;
     padding: 0.8rem;
 }
 .add-submit-btn{
-    transform: translateX(100%);
+    align-self: center;
     width:200px;
     padding: 1rem;
     color: aliceblue;
@@ -37,4 +41,34 @@
     
     background: #5a173f;
     box-shadow: 3px 3px gray;
+}
+
+@media (max-width: 1024px) {
+    .add-form-div {
+        width: calc(100% - 3rem);
+        padding: 3rem 2rem;
+    }
+}
+
+@media (max-width: 760px) {
+    .add-form-div {
+        width: calc(100% - 2rem);
+        padding: 1.5rem;
+        font-size: 20px;
+    }
+
+    .add-form label {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .add-form input {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .add-submit-btn {
+        width: 100%;
+    }
 }

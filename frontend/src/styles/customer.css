@@ -3,6 +3,7 @@
     padding: 5rem;
     display: flex;
     justify-content:space-around;
+    gap: 2rem;
     font-size: 25px;
     color: rgba(60, 61, 61, 0.877);
 }
@@ -24,6 +25,7 @@
     border: 1px solid rgba(0, 0, 0, 0.3);
     height: 70vh;
     width: 15vw;
+    min-width: 230px;
 }
 
 .customer-img{
@@ -82,12 +84,13 @@
     background: #f5f5f5;
     padding: 1rem;
     width: 500px;
+    max-width: 100%;
     text-align: center;
     border: none;
     border-radius: 10px;
 }
 .prof-btn{
-    transform: translateX(200%);
+    align-self: flex-end;
     width:200px;
     padding: 1rem;
     color: aliceblue;
@@ -101,4 +104,79 @@
     
     background: #5a173f;
     box-shadow: 3px 3px gray;
+}
+
+.password-change-text {
+    transform: translateX(40%);
+    color: rgba(20, 9, 37, 0.521);
+}
+
+@media (max-width: 1024px) {
+    .customer-div {
+        padding: 3rem 2rem;
+        align-items: flex-start;
+    }
+
+    .customer-nav {
+        width: 28%;
+        min-width: 210px;
+        padding: 1.5rem;
+    }
+
+    .prof-sub-div {
+        width: 68%;
+        padding: 2rem;
+    }
+
+    .customer-right input {
+        width: 100%;
+    }
+}
+
+@media (max-width: 760px) {
+    .customer-div {
+        flex-direction: column;
+        padding: 1.5rem 1rem;
+        font-size: 20px;
+    }
+
+    .customer-nav,
+    .prof-sub-div {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .customer-nav {
+        height: auto;
+        padding: 1rem;
+    }
+
+    .prof-sub-div {
+        padding: 1.25rem;
+    }
+
+    .customer-right {
+        padding: 1rem 0;
+        width: 100%;
+    }
+
+    .customer-right-fields {
+        width: 100%;
+        align-self: stretch;
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .customer-right-fields label {
+        flex: none;
+    }
+
+    .prof-btn {
+        width: 100%;
+        align-self: stretch;
+    }
+
+    .password-change-text {
+        transform: none;
+    }
 }

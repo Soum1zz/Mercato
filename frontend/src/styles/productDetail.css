@@ -12,6 +12,7 @@
 }
 .prod-det-left{
     width: 35vw;
+    min-width: 360px;
 }
 .prod-img{
     background: #fafafa;
@@ -22,12 +23,13 @@
     align-items: center;
     margin: 0 auto;
     width: 400px;
+    max-width: 100%;
 }
 .heart{
     font-size: 50px;
     position: absolute;
     top: 60px;
-    left: 580px;
+    left: min(580px, 42vw);
     color: #6b1d4d;
 }
 .prod-det-right{
@@ -38,6 +40,7 @@
     /* justify-content: center; */
     padding: 3rem;
     width: 43vw;
+    min-width: 420px;
     border: 1px solid rgba(0, 0, 0, 0.3);
     
 }
@@ -139,4 +142,82 @@
     font-size: 40px;
     /* object-fit: cover; */
 
+}
+
+.review-modal textarea {
+    max-width: 100%;
+}
+
+@media (max-width: 1024px) {
+    .prod-det-div {
+        padding: 2rem 1.5rem;
+        gap: 1.5rem;
+    }
+
+    .prod-det-left,
+    .prod-det-right {
+        min-width: 0;
+        width: 50%;
+    }
+
+    .prod-det-right {
+        padding: 2rem;
+    }
+
+    .heart {
+        left: calc(50% - 4.5rem);
+    }
+}
+
+@media (max-width: 760px) {
+    .prod-det-div {
+        flex-direction: column;
+        padding: 1rem;
+        font-size: 18px;
+    }
+
+    .prod-det-left,
+    .prod-det-right {
+        width: 100%;
+    }
+
+    .prod-img {
+        width: 100%;
+        padding: 1.5rem;
+    }
+
+    .heart {
+        top: 2rem;
+        right: 2rem;
+        left: auto;
+        font-size: 42px;
+    }
+
+    .prod-det-right {
+        padding: 1.25rem;
+        gap: 1rem;
+    }
+
+    .prod-det-right > div:first-child {
+        font-size: 36px !important;
+    }
+
+    .prod-det-right > div:nth-child(3) {
+        font-size: 34px !important;
+    }
+
+    .counter {
+        width: 100%;
+        max-width: 250px;
+    }
+
+    .prod-det-btn,
+    .comment-btn {
+        width: 100%;
+        max-width: 260px;
+    }
+
+    .review-actions {
+        flex-wrap: wrap;
+    }
 }

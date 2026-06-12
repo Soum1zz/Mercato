@@ -2,6 +2,7 @@
     padding: 5rem;
     display: flex;
     justify-content:space-around;
+    gap: 2rem;
     font-size: 25px;
     color: rgba(60, 61, 61, 0.877);
 }
@@ -10,6 +11,7 @@
     border: 1px solid rgba(0, 0, 0, 0.3);
     height: min-content;
     width: 15vw;
+    min-width: 230px;
     font-size: 20px;
 
 }
@@ -38,12 +40,77 @@
     padding: 2rem;
 }
 .all-prods{
-    display: flex;
     padding: 2rem;
     display: flex;
     flex-wrap: wrap;
-    gap: 8rem;
+    gap: 4rem;
     justify-content: center;
     align-items: center;
     
+}
+
+@media (max-width: 1024px) {
+    .prods-div {
+        padding: 3rem 2rem;
+        align-items: flex-start;
+    }
+
+    .prods-nav {
+        padding: 1.5rem;
+        width: 28%;
+        min-width: 210px;
+    }
+
+    .prod-right {
+        width: 68%;
+        padding: 1.5rem;
+        max-height: none;
+    }
+
+    .all-prods {
+        gap: 2rem;
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 760px) {
+    .prods-div {
+        flex-direction: column;
+        padding: 1.5rem 1rem;
+        font-size: 20px;
+    }
+
+    .prods-nav,
+    .prod-right {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .prods-nav {
+        padding: 1rem;
+    }
+
+    .prod-nav-sub {
+        display: flex;
+        gap: 0.75rem;
+        overflow-x: auto;
+        padding-bottom: 0.35rem;
+    }
+
+    .prod-nav-sub-cat {
+        flex: 0 0 auto;
+        height: 48px;
+        margin: 0;
+        white-space: nowrap;
+    }
+
+    .prod-right {
+        padding: 1rem;
+        overflow: visible;
+    }
+
+    .all-prods {
+        padding: 1rem 0;
+        gap: 1.25rem;
+    }
 }

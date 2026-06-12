@@ -1,21 +1,17 @@
-import electronics from "../assets/electronics.png"
-import fashion from "../assets/fash.png"
-import food from "../assets/food.png"
-import cosme from "../assets/cosme.png"
+
+
 import truck from "../assets/truck.png"
 import returnImg from "../assets/return.png"
 import secure from "../assets/secure.png"
 import sparkle from "../assets/sparkle.png"
+import { useNavigate } from "react-router-dom"
 
 
-
-import { useEffect, useState } from "react";
 import "../styles/hero.css"
 
 export default function Hero(){
-    const images= [electronics, fashion, food, cosme];
-    const [curInd, setCurInd]= useState(0);
 
+    const navigate = useNavigate()
 
     return(
         <div className="hero-div">
@@ -25,7 +21,11 @@ export default function Hero(){
             <div className="hero-content">
             <div className="hero-txt">Fashion Redefined</div>
             <div className="hero-sub-txt">Discover quality fashion ,and essentials - curated for everyday life</div>
-            <button className="hero-btn">Shop now</button>
+            <button className="hero-btn"
+            onClick={()=>{
+                navigate("/products")
+            }}
+            >Shop now</button>
             
             </div>
             <div className="hero-footer">

@@ -3,6 +3,7 @@
     padding: 5rem;
     display: flex;
     justify-content: space-around;
+    align-items: center;
     gap: 2rem;
     margin-bottom: 4rem;
 }
@@ -17,6 +18,7 @@
 }
 .about-img{
     width: 700px;
+    max-width: 50%;
     border-radius: 10px;
 }
 .about-info{
@@ -28,4 +30,35 @@
 
 .about-info p{
     line-height: 1.8;
+}
+
+@media (max-width: 1024px) {
+    .about-div {
+        padding: 4rem 2rem;
+    }
+
+    .about-info h1 {
+        font-size: 56px !important;
+    }
+}
+
+@media (max-width: 760px) {
+    .about-div {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 2rem 1rem;
+    }
+
+    .about-img {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .about-info {
+        font-size: 18px;
+    }
+
+    .about-info h1 {
+        font-size: 38px !important;
+    }
 }

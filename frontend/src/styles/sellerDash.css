@@ -1,5 +1,5 @@
 .seller-div{
-    width: 80vw;
+    width: min(80vw, 1200px);
     height: min-content;
     margin: 0 auto;
     margin-top: 3rem;
@@ -20,6 +20,7 @@
     display: flex;
     width: 70%;
     align-items: center;
+    gap: 1rem;
     /* justify-content: center; */
 }
 .sell-veri-div.active{
@@ -112,6 +113,7 @@
     background: #8b9cb91f;
     padding: 1rem;
     width: 400px;
+    max-width: 100%;
     text-align: center;
     border: none;
     border-radius: 10px;
@@ -141,4 +143,68 @@
 }
 .add-btn{
     margin-left: 35vw;
+}
+
+@media (max-width: 1024px) {
+    .seller-div {
+        width: calc(100% - 3rem);
+        padding: 3rem 2rem;
+    }
+
+    .sell-veri-div {
+        width: 100%;
+        height: auto;
+        padding: 2rem;
+    }
+
+    .add-btn {
+        margin-left: auto;
+    }
+}
+
+@media (max-width: 760px) {
+    .seller-div {
+        width: calc(100% - 2rem);
+        padding: 1.5rem;
+        font-size: 20px;
+    }
+
+    .sell-veri-div {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 1.25rem;
+    }
+
+    .veri-stat {
+        width: 100%;
+    }
+
+    .veri-btn,
+    .modal-btn,
+    .add-btn {
+        width: 100%;
+    }
+
+    .modal-backdrop {
+        align-items: flex-start;
+        padding: 1rem;
+        overflow-y: auto;
+    }
+
+    .modal-card {
+        padding: 1.25rem;
+        max-width: 100%;
+    }
+
+    .modal-card label {
+        flex-direction: column;
+    }
+
+    .modal-card input {
+        width: 100%;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+    }
 }

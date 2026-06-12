@@ -3,18 +3,18 @@ import "../styles/Navbar.css"
 import { IoMdSearch } from "react-icons/io";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { IoCart } from "react-icons/io5";
-import cart from '../assets/cart-no-notif.png'
+import { IoClose, IoMenu } from "react-icons/io5";
 import { getCurrentUser, isAuthenticated, logout } from "../auth/authService";
 import { FaUser } from "react-icons/fa";
-import { TbShoppingCart, TbShoppingCartExclamation } from "react-icons/tb";
+import { TbShoppingCart } from "react-icons/tb";
 
 export default function Navbar({ scrollToAbout, scrollToContact}){
     const navigate= useNavigate();
     const location= useLocation();
-    const [authenticated, setAuthenticated]= useState(isAuthenticated());
     const [searchBarOpen, setSearchBarOpen]= useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const[searchQuery, setSearchQuery] = useState("");
+    const authenticated = isAuthenticated();
 
     const searchRef= useRef(null);
 
@@ -25,10 +25,11 @@ export default function Navbar({ scrollToAbout, scrollToContact}){
             state: {search: searchQuery}
         });
         setSearchBarOpen(false);
+        setMobileMenuOpen(false);
     }
     const handleLogOut=()=>{
         logout();
-        setAuthenticated(false);
+        setMobileMenuOpen(false);
         navigate("/auth", {replace:true});
     }
     const handleAuth= ()=>{
@@ -57,9 +58,6 @@ export default function Navbar({ scrollToAbout, scrollToContact}){
 
     },[searchBarOpen]);
 
-    useEffect(()=>{
-            setAuthenticated(isAuthenticated());
-    },[location.pathname])
     const handleNavigation= (type)=>{
         if(location.pathname !== "/"){
              navigate("/",{
@@ -68,7 +66,22 @@ export default function Navbar({ scrollToAbout, scrollToContact}){
         } else{
             type === "about"? scrollToAbout():scrollToContact();
         }
+        setMobileMenuOpen(false);
     };
+
+    const navigateAndClose = (path) => {
+        navigate(path);
+        setMobileMenuOpen(false);
+    };
+
+    const renderNavLinks = () => (
+        <>
+            <button type="button" onClick={()=>navigateAndClose("/")}>Home</button>
+            <button type="button" onClick={()=>navigateAndClose("/products")}>Products</button>
+            <button type="button" onClick={()=>handleNavigation("about")}>About Us</button>
+            <button type="button" onClick={()=>handleNavigation("contact")}>Contact Us</button>
+        </>
+    );
 
 
 
@@ -84,27 +97,13 @@ export default function Navbar({ scrollToAbout, scrollToContact}){
                 Mercato
             </div>
             <div className="nav-search-field">
-                <div
-             onClick={()=>navigate("/")}
-             style={{cursor:"pointer"}}
-                >Home</div>
-                <div
-             onClick={()=>navigate("/products")}
-             style={{cursor:"pointer"}}
-                >Products</div>
-                <div
-                onClick={()=>handleNavigation("about")}
-                             style={{cursor:"pointer"}}>About Us</div>
-                <div
-                onClick={()=>handleNavigation("contact")}
-                             style={{cursor:"pointer"}}>Contact Us</div>
+                {renderNavLinks()}
             </div>
-            <div
-            style={{fontSize:"35px"}}
-             className="nav-buttons">
+            <div className="nav-buttons">
                 <div
                 ref={searchRef
                 }
+                className="nav-search-action"
                 >
                 {searchBarOpen&&(
                     <div className="search-field">
@@ -117,7 +116,6 @@ export default function Navbar({ scrollToAbout, scrollToContact}){
                     </div>)}
 
                  <IoMdSearch size={40}
-                 style={{marginTop:"10px", cursor:"pointer"}}
                     onClick={()=>{
                         if(searchBarOpen&& searchQuery.trim()){
                             handleSearch();
@@ -127,24 +125,34 @@ export default function Navbar({ scrollToAbout, scrollToContact}){
                         }}
                  />
                 </div>
-                <div
-                style={{
-                    display:"flex",alignItems:"baseline"
-                }}
-                >
+                <div className="logout-wrap">
                 {authenticated &&
                 (<button className="log-out-btn" onClick={handleLogOut}>Log out</button>)}
                 </div>
                 <FaUser size={30}
                     onClick={handleAuth}
+                    className="nav-icon"
                 />
                 
                 
                 <div
+                className="cart-icon-wrap"
                 onClick={()=>navigate("/cart")}
                 ><TbShoppingCart
-                style={{position: "absolute", top: "3rem"}}
                  size={35}/></div>
+                <button
+                    type="button"
+                    className="menu-toggle"
+                    aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+                    onClick={() => setMobileMenuOpen((prev) => !prev)}
+                >
+                    {mobileMenuOpen ? <IoClose /> : <IoMenu />}
+                </button>
+            </div>
+            <div className={`mobile-nav ${mobileMenuOpen ? "open" : ""}`}>
+                {renderNavLinks()}
+                {authenticated &&
+                    (<button type="button" onClick={handleLogOut}>Log out</button>)}
             </div>
 
         </div>
