@@ -1,12 +1,14 @@
 .loader {
-  margin-top: 40vh;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 40vh auto 0;
   width: 22px;
   aspect-ratio: 1;
   border-radius: 50%;
   background: #F10C49;
   animation: l10 1.5s infinite linear;
+}
+
+.loader.inline-loader {
+  margin: 0 auto;
 }
 @keyframes l10 {
   0%    {box-shadow: 

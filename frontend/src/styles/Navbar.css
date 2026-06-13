@@ -4,9 +4,9 @@
   display: flex;
   background: #ffff;
   align-items: center;
-  gap: 5%;
+  gap: 2rem;
   min-height: 100px;
-  justify-content: space-around;
+  justify-content: space-between;
   font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
     "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
   padding: 1rem;
@@ -28,6 +28,7 @@ select {
   align-items: center;
   gap: 1.5rem;
   justify-content: center;
+  flex: 1;
   font-size: 20px;
 }
 
@@ -44,9 +45,10 @@ select {
 .nav-buttons {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 1.4rem;
+  justify-content: flex-end;
+  gap: 1.2rem;
   font-size: 35px;
+  min-width: max-content;
 }
 .log-out-btn{
   padding: 0.5rem;
@@ -61,20 +63,35 @@ select {
   display: flex;
   align-items: center;
 }
+.nav-search-action {
+  position: relative;
+  gap: 0.6rem;
+  min-height: 44px;
+}
 .nav-search-action svg,
 .nav-icon,
 .cart-icon-wrap {
   cursor: pointer;
 }
-.search-field input {
+.search-field {
+  display: flex;
+  align-items: center;
   position: absolute;
+  right: calc(100% + 0.75rem);
+  top: 50%;
+  z-index: 20;
+  transform: translateY(-50%);
+}
+.search-field input {
   padding: 1rem;
-  width: 200px;
+  width: min(280px, 24vw);
+  min-width: 220px;
   height: 42px;
-  right: 25vw;
-  top: 2.9rem;
   border: 1px solid #ddd;
   border-radius: 6px;
+  background: #fff;
+  box-shadow: none;
+  z-index: 20;
 }
 .menu-toggle,
 .mobile-nav {
@@ -83,8 +100,7 @@ select {
 
 @media (max-width: 1024px) {
   .navbar-div {
-    gap: 1.5rem;
-    justify-content: space-between;
+    gap: 1rem;
   }
 
   .brand-name {
@@ -97,11 +113,12 @@ select {
   }
 
   .nav-buttons {
-    gap: 1rem;
+    gap: 0.9rem;
   }
 
   .search-field input {
-    right: 12rem;
+    width: 190px;
+    min-width: 190px;
   }
 }
 
@@ -109,6 +126,10 @@ select {
   .navbar-div {
     min-height: 78px;
     padding: 0.8rem 1rem;
+  }
+
+  .navbar-div.search-open {
+    margin-bottom: 4rem;
   }
 
   .brand-name {
@@ -122,6 +143,20 @@ select {
   .nav-buttons {
     gap: 0.75rem;
     margin-left: auto;
+    min-width: 0;
+  }
+
+  .nav-search-action {
+    position: static;
+  }
+
+  .search-field {
+    position: absolute;
+    left: 1rem;
+    right: 1rem;
+    top: calc(100% + 0.75rem);
+    z-index: 20;
+    transform: none;
   }
 
   .logout-wrap {
@@ -173,11 +208,9 @@ select {
   }
 
   .search-field input {
-    left: 1rem;
-    right: 1rem;
-    top: calc(100% + 0.7rem);
-    width: calc(100% - 2rem);
-    z-index: 2;
+    width: 100%;
+    min-width: 0;
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
   }
 }
 

@@ -36,8 +36,9 @@
 
 @media (max-width: 760px) {
     .footer-cont {
+        font-size: small;
         align-items: flex-start;
-        flex-direction: column;
+        /* flex-direction: column; */
         padding: 1rem;
     }
 

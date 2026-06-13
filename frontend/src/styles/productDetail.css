@@ -11,6 +11,8 @@
 
 }
 .prod-det-left{
+    height: 80vh;
+    overflow-x: hidden;
     width: 35vw;
     min-width: 360px;
 }
@@ -33,7 +35,8 @@
     color: #6b1d4d;
 }
 .prod-det-right{
-    height: min-content;
+    height: 80vh;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;

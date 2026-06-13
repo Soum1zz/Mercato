@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import toast from "react-hot-toast";
+import Loader from "./Loader";
 
 export default function OtpInput({  setStep }) {
   const [otp, setOtp] = useState(new Array(6).fill(""));
@@ -51,26 +52,32 @@ export default function OtpInput({  setStep }) {
     if (!email) {
       toast.error("Session expired. Please enter email again.");
       setStep("email");
+      setLoading(false);
       return;
     }
 
-    const res = await fetch("http://localhost:8080/api/verify-otp", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ 
-        email: email
-        , otp: finalOtp }),
-    });
+    try {
+      const res = await fetch("http://localhost:8080/api/verify-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email
+          , otp: finalOtp }),
+      });
 
-    if (res.ok) {
-      toast.success("Your email is verified with Mercato!!")
-      setStep("signup") ;
-    } else {
-      toast.error("Invalid OTP");
+      if (res.ok) {
+        toast.success("Your email is verified with Mercato!!")
+        setStep("signup") ;
+      } else {
+        toast.error("Invalid OTP");
+      }
+    } catch {
+      toast.error("OTP verification failed");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -97,11 +104,16 @@ export default function OtpInput({  setStep }) {
         ))}
       </div>
 
-      <button onClick={verifyOtp} className="auth-btn"
+      <button type="button" onClick={verifyOtp} className="auth-btn"
       disabled={loading}
       >
         Verify OTP
       </button>
+      {loading && (
+        <div className="otp-loader">
+          <Loader className="inline-loader" />
+        </div>
+      )}
     </div>
   );
 }

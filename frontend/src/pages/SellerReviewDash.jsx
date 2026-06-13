@@ -60,38 +60,47 @@ export default function SellerReviewDash() {
   },[sellerReq?.userId])
   return (
     <div className='sell-div'>
+      <div className="seller-review-header">
+        <div>
+          <h1>Seller Review</h1>
+          <p>Review the seller profile and uploaded document before taking action.</p>
+        </div>
+      </div>
       <div className="sell-det">
         <div>
-          <img src={imgUrl} alt="" className="sell-img" />
+          <img src={imgUrl} alt={sellerReq.name} className="sell-img" />
         </div>
-        <div><div>
-          <b>Seller name: </b>{sellerReq.name}
+        <div className="seller-info-list"><div>
+          <span>Seller name</span>{sellerReq.name}
 
         </div>
           <div>
-            <b> Seller address: </b> {sellerReq.address}
+            <span>Seller address</span> {sellerReq.address}
 
           </div>
           <div>
-            <b>Seller pincode:</b>  {sellerReq.pinCode}
+            <span>Seller pincode</span>  {sellerReq.pinCode}
 
           </div>
           <div>
-            <b>Business email: </b> {sellerReq.email}
+            <span>Business email</span> {sellerReq.email}
 
           </div>
           <div>
-            <b>Business phone number:</b> {sellerReq.phoneNumber}
+            <span>Business phone number</span> {sellerReq.phoneNumber}
 
           </div></div>
 
 
       </div>
       <div className="sell-doc">
-        <div>Seller's uploaded tax document :</div>
+        <div>
+          <h2>Tax document</h2>
+          <p>Seller uploaded certificate for verification.</p>
+        </div>
         {
           !certImg ? (
-            <div>
+            <div className="empty-doc">
               No doc provided
             </div>
           ) :
@@ -102,12 +111,12 @@ export default function SellerReviewDash() {
                   !showCert?(<button
                   className='view-btn'
                   onClick={() => setCert(true)}
-                >view</button>):(
-                    <div>
+                >View</button>):(
+                    <div className="cert-preview">
                       <img src={certImg}
-                        style={{ maxWidth: "100%", maxHeight: "70vh" }}
+                        alt="Seller tax certificate"
                       />
-                      <button onClick={() => setCert(false)}>
+                      <button className="view-btn" onClick={() => setCert(false)}>
                         Close
                       </button>
                     </div>
@@ -118,9 +127,7 @@ export default function SellerReviewDash() {
         }
       </div>
       <div className="acc-div">
-        <p
-          style={{ color: "black", fontSize: "20px" }}
-        > Please check the documents submitted by the seller and approve them accordingly</p>
+        <p>Please check the documents submitted by the seller and approve them accordingly.</p>
         <div className='acc-btn-grp'>
           <button className="acc-btn"
           onClick={verifyHandler}

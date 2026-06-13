@@ -1,13 +1,4 @@
-{/* <button onClick={()=>{navigate("/productForm")}}> add me</button>  */}
-            {/* <div>
-                {products&& products.length>0?(
-                            products.map((product)=>(
-                                <ProductCard key={product.id} product={product}/>
-                            ))):
-                                (<p> No product available</p>)
-                            
-            }
-            </div> */}
+
 
 import Hero from "../components/Hero";
 import About from "../components/About";

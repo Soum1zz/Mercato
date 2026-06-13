@@ -1,8 +1,8 @@
 import "../styles/loader.css";
 
-export default function Loader() {
+export default function Loader({ className = "" }) {
   return (
-    <div className="loader">
+    <div className={`loader ${className}`.trim()} role="status" aria-label="Loading">
     </div>
   );
 }

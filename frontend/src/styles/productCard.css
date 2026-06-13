@@ -4,15 +4,20 @@
     display: flex;
     font-size: 10px;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
     border: 1px solid black;
     border-radius: 10px;
-    width: 200px;
+    width: 100%;
+    max-width: 220px;
     gap: 1rem;
     border: 1px solid rgba(0, 0, 0, 0.3);
 
+}
+.prod-card img{
+    width: 120px;
+    height: 150px;
+    object-fit: contain;
 }
 .text-field{
     margin: 1rem 0 ;
@@ -42,7 +47,8 @@
 
 @media (max-width: 760px) {
     .prod-card {
-        width: min(100%, 280px);
+        width: 100%;
+        max-width: 280px;
         height: auto;
         min-height: 360px;
     }

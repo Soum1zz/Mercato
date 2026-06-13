@@ -1,4 +1,4 @@
-import { useState ,useEffect} from "react";
+import { useState } from "react";
 import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
 import { IoReturnUpBack } from "react-icons/io5";
 import "../styles/auth.css";
@@ -23,7 +23,7 @@ export default function Authenticate() {
   const notPassMatch = passwordData.password !== passwordData.confirmPassword;
   const ConfEmpty = passwordData.confirmPassword.length === 0;
   const hasNumber = /\d/.test(passwordData.password);
-  const hasSpecial = /[{(!@#$%^&*|\=})\-]/.test(passwordData.password);
+  const hasSpecial = /[{(!@#$%^&*|=})-]/.test(passwordData.password);
   const hasEightChar = passwordData.password.length >= 8;
   const hasEmptySpace = !passwordData.password.includes(" ");
   const strengthScore = [
@@ -59,11 +59,68 @@ export default function Authenticate() {
   const handleShow = () => setShowPassword(true);
   const handleHide = () => setShowPassword(false);
 
-  if (loading === true) return <Loader></Loader>;
+  const requestOtp = async () => {
+    setLoading(true);
+    localStorage.setItem("email", email);
+
+    try {
+      const resp = await fetch("http://localhost:8080/api/request-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+        }),
+      });
+
+      if (resp.status === 200) {
+        toast.success("OTP generated please check your email!!");
+        setStep("otp");
+      } else {
+        toast.error("OTP can't be generated at this moment!!");
+      }
+    } catch {
+      toast.error("OTP can't be generated at this moment!!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const requestResetLink = async () => {
+    setLoading(true);
+    localStorage.setItem("email", email);
+
+    try {
+      const resp = await fetch("http://localhost:8080/api/link-req", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: email }),
+      });
+
+      if (resp.status === 200) {
+        toast.success("Link sent please check your email!!");
+      } else {
+        const message = await resp.text();
+        toast.error(message || "Link can't be sent at this moment!!");
+      }
+    } catch {
+      toast.error("Link can't be sent at this moment!!");
+    } finally {
+      setLoading(false);
+    }
+  };
 
  
   return (
     <div className="auth-div">
+      {loading && (
+        <div className="auth-loader-overlay">
+          <Loader className="inline-loader" />
+        </div>
+      )}
       <form
         className="form-grid"
         onSubmit={async (e) => {
@@ -106,8 +163,10 @@ export default function Authenticate() {
             } catch (e) {
               if (e.response?.status === 409)
                 toast.error("Email already exists!");
+              else toast.error("Sign up failed");
+            } finally {
+              setLoading(false);
             }
-            setLoading(false);
           } else if(step === "login") {
             setLoading(true);
             const payLoad = {
@@ -149,9 +208,10 @@ export default function Authenticate() {
               }
             } catch (e) {
               console.log("Network Error: ", e);
+              toast.error("Log in failed");
+            } finally {
+              setLoading(false);
             }
-
-            setLoading(false);
           }
         }}
       >
@@ -233,7 +293,7 @@ export default function Authenticate() {
               <label>
                 Password:
                 <input
-                  type={showPassword ? "type" : "password"}
+                  type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
                   name="password"
                   required
@@ -289,7 +349,7 @@ export default function Authenticate() {
             <button
               className="auth-btn"
               type="submit"
-              disabled={notPassMatch || ConfEmpty}
+              disabled={notPassMatch || ConfEmpty || loading}
             >
               {" "}
               Sign up
@@ -344,7 +404,7 @@ export default function Authenticate() {
             </div>
 
             <br />
-            <button className="auth-btn" type="submit">
+            <button className="auth-btn" type="submit" disabled={loading}>
               {" "}
               Login
             </button>
@@ -377,54 +437,20 @@ export default function Authenticate() {
 
             {
             Link==false&&<button
-              onClick={async() => { 
-                localStorage.setItem("email", email);
-                const resp =await fetch("http://localhost:8080/api/request-otp", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",   
-                },
-                  body: JSON.stringify({
-                    email: email,
-                  }),
-                });
-
-                if(resp.status===200)
-                {
-                    toast.success("OTP generated please check your email!!");
-                    setStep("otp");
-                }
-                else {
-                    toast.error("OTP can't be generated at this moment!!");
-                }
-              }}
+              type="button"
+              onClick={requestOtp}
               className="auth-btn"
+              disabled={loading}
             >
               Get OTP
             </button>
             }
             {
               Link==true&&<button
-              onClick={async() => { 
-                localStorage.setItem("email", email);
-                const resp =await fetch("http://localhost:8080/api/link-req", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",   
-                },
-                  body: JSON.stringify({email:email}),
-                });
-
-                if(resp.status===200)
-                {
-                    toast.success("Link sent please check your email!!");
-                    // setStep("otp");
-                }
-                else {
-                    toast.error("Link can't be sent at this moment!!");
-                }
-              }}
+              type="button"
+              onClick={requestResetLink}
               className="auth-btn"
+              disabled={loading}
             >
               Get Link
             </button>

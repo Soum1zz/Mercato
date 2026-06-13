@@ -53,13 +53,12 @@ export default function Products() {
         
     }, [content,search]
     );
-    if (loading) return <Loader></Loader>
     console.log(products);
     return (
         <div className="prods-div">
             <div className='prods-nav'>
                 <div
-                    style={{ fontSize: "30px" }}
+                    style={{ fontSize: "30px" , marginBottom: "1rem"}}
                 >Categories</div>
                 <div className='prod-nav-sub'>
                     <div onClick={() => { setContent("All Products") }} className={`prod-nav-sub-cat ${content === "All Products" ? "active" : ''}`} >
@@ -85,13 +84,19 @@ export default function Products() {
             <div className="prod-right">
 
                 <h2> {content}</h2>
-                <div className="all-prods">
-                    {
-                        products.map((product) => (
-                            <ProductCard key={product.id} product={product} />
-                        ))
-                    }
-                </div>
+                {loading ? (
+                    <div className="prod-loader">
+                        <Loader className="inline-loader" />
+                    </div>
+                ) : (
+                    <div className="all-prods">
+                        {
+                            products.map((product) => (
+                                <ProductCard key={product.id} product={product} />
+                            ))
+                        }
+                    </div>
+                )}
             </div>
 
         </div>

@@ -83,30 +83,38 @@ export default function SellerDash() {
     }, []);
     return (
         <div className="seller-div">
-            <h1>Hello {user?.name}</h1>
-            <h2>Mercato values your products.</h2>
+            <div className="seller-header">
+                <div>
+                    <h1>Hello {user?.name}</h1>
+                    <p>Manage your verification and product listings from one place.</p>
+                </div>
+                <span className={`seller-status ${sellDet?.status === "APPROVED" ? "approved" : "pending"}`}>
+                    {sellDet?.status === "APPROVED" ? "Verified seller" : "Verification pending"}
+                </span>
+            </div>
             <div className={`sell-veri-div ${sellDet?.status === "PENDING"||sellDet === null ? "" : "active"}`}>
                 {
                     sellDet?.status === "PENDING"||sellDet === null
                      ? (<div className="veri-stat">
-                        <div style={{ fontSize: "30px" }}>Your verification is pending</div>
+                        <div className="veri-title">Your verification is pending</div>
                         <div>Please provide your business details to get verified and post your products.</div>
                         <div>P.S. we value your privacy.</div>
                         <button className="veri-btn"
                             onClick={() => setForm(true)}
                         >Submit your details</button>
                     </div>) : (
-                        <div>
-                            Congrats you are now a verified Mercato seller.
+                        <div className="veri-stat">
+                            <div className="veri-title">You are verified</div>
+                            <div>Congrats, you can now post products on Mercato.</div>
                         </div>
 
                     )
                 }
-                <div>
-                    <img src={veriImg} width={500} />
+                <div className="seller-verify-art">
+                    <img src={veriImg} alt="Seller verification" />
                 </div>
             </div>
-            {sellDet?.status === "APPROVED" && <div style={{ padding: "3rem" }}>
+            {sellDet?.status === "APPROVED" && <div className="seller-products-panel">
                 <div className="add-btn-div">
                     <button className="add-btn"
                         onClick={() => {
@@ -118,6 +126,7 @@ export default function SellerDash() {
 
                 <div className="product-div">
                     <h2>Your Products:</h2>
+                    <p>Your listed products will appear here.</p>
                 </div>
 
             </div>}

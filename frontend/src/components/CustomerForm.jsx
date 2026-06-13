@@ -1,11 +1,53 @@
 
 import '../styles/customer.css'
-import { getToken } from "../auth/authService";
+import toast from "react-hot-toast";
+import { getToken, getCurrentUser } from "../auth/authService";
+import { useState } from 'react';
+import Loader from './Loader';
 export default function CustomerForm({ user, isForm, setForm }) {
+  const [loading, setLoading]= useState(false)
   const btnHandler = () => {
     setForm(true);
   }
-  return (<div>
+  const requestResetLink = async () => {
+    const currentUser = getCurrentUser();
+    const resetEmail = user?.email || currentUser?.sub || currentUser?.email;
+
+    if (!resetEmail) {
+      toast.error("Email not found. Please log in again.");
+      return;
+    }
+
+    setLoading(true);
+    localStorage.setItem("email", resetEmail);
+
+    try {
+      const resp = await fetch("http://localhost:8080/api/link-req", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: resetEmail }),
+      });
+
+      if (resp.status === 200) {
+        toast.success("Link sent please check your email!!");
+      } else {
+        const message = await resp.text();
+        toast.error(message || "Link can't be sent at this moment!!");
+      }
+    } catch {
+      toast.error("Link can't be sent at this moment!!");
+    } finally {
+      setLoading(false);
+    }
+  };
+  return (<div className="customer-form-wrap">
+    {loading && (
+      <div className="customer-loader-overlay">
+        <Loader className="inline-loader" />
+      </div>
+    )}
     <h2>My Profile</h2>
     <form className="customer-right"
 
@@ -75,7 +117,14 @@ export default function CustomerForm({ user, isForm, setForm }) {
         }
         </form>
 
-    <p className="password-change-text">Change your password</p>
+    <p className="password-change-text"
+    
+    onClick={
+      requestResetLink
+    }
+    
+    
+    >Change your password</p>
   </div>)
 }
 

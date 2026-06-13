@@ -12,7 +12,7 @@ export default function SellerForm({ sellDet, onClose, user }) {
   return (
     <div className="modal-backdrop">
       <div className="modal-card">
-        <div style={{ marginBottom: "30px", fontSize: "40px" }}>
+        <div className="modal-title">
           Seller verification form
         </div>
 
@@ -73,17 +73,18 @@ export default function SellerForm({ sellDet, onClose, user }) {
             }
           }}
         >
-          <label>Business description :</label>
-          <input name="desc" type="text" defaultValue={sellDet?.description} />
+          <label htmlFor="seller-desc">Business description</label>
+          <input id="seller-desc" name="desc" type="text" defaultValue={sellDet?.description} />
 
-          <label>Tax id :</label>
-          <input name="taxId" type="text" defaultValue={sellDet?.taxId} />
+          <label htmlFor="seller-tax-id">Tax ID</label>
+          <input id="seller-tax-id" name="taxId" type="text" defaultValue={sellDet?.taxId} />
 
-          <label>Upload your tax certificate</label>
+          <label htmlFor="seller-cert">Tax certificate</label>
           <input
+            id="seller-cert"
             name="cert"
             type="file"
-            style={{ border: "none", background: "none", width: "200px" }}
+            className="file-input"
           />
 
           <div className="modal-actions">

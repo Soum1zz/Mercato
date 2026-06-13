@@ -29,7 +29,8 @@ public class PasswordResetController {
             prService.sendEmail(req.email());
             return ResponseEntity.ok("Link sent to your email: " + req.email());
         }catch(Exception e){
-            return ResponseEntity.badRequest().build();
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 

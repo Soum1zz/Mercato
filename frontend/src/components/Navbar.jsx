@@ -86,7 +86,7 @@ export default function Navbar({ scrollToAbout, scrollToContact}){
 
 
     return (
-        <div className="navbar-div">
+        <div className={`navbar-div ${searchBarOpen ? "search-open" : ""}`}>
 
             <div
             style={{fontSize:"45px",fontWeight:"bolder", cursor: "pointer"}}
@@ -121,6 +121,7 @@ export default function Navbar({ scrollToAbout, scrollToContact}){
                             handleSearch();
                         }else{
                             setSearchBarOpen(true);
+                            setMobileMenuOpen(false);
                         }
                         }}
                  />
@@ -144,7 +145,10 @@ export default function Navbar({ scrollToAbout, scrollToContact}){
                     type="button"
                     className="menu-toggle"
                     aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-                    onClick={() => setMobileMenuOpen((prev) => !prev)}
+                    onClick={() => {
+                        setMobileMenuOpen((prev) => !prev);
+                        setSearchBarOpen(false);
+                    }}
                 >
                     {mobileMenuOpen ? <IoClose /> : <IoMenu />}
                 </button>
