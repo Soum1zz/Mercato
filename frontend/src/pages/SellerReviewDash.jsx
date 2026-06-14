@@ -5,6 +5,7 @@ import { getToken, isTokenExpired } from '../auth/authService';
 export default function SellerReviewDash() {
   const { state } = useLocation();
   const navigate = useNavigate();
+  const sellerReq = state?.sellerReq;
   const [showCert, setCert] = useState(false);
   const [certImg, setCertImg] = useState(null);
   const verifyHandler= async()=>{
@@ -24,17 +25,15 @@ export default function SellerReviewDash() {
   }
     
   }
-  if (!state?.sellerReq) {
-    navigate("/admin");
-    // return null;
-
-  }
-  const { sellerReq } = state;
   const imgUrl = sellerReq ? `http://localhost:8080/api/user/${sellerReq.userId}/image` : null;
   useEffect(()=>{
     const token=getToken();
     if(!token|| isTokenExpired(token)){
       navigate("/auth");
+      return;
+    }
+    if (!sellerReq) {
+      navigate("/admin");
       return;
     }
     const fetchCert= async()=>{
@@ -57,7 +56,10 @@ export default function SellerReviewDash() {
     
   fetchCert();
   
-  },[sellerReq?.userId])
+  },[navigate, sellerReq])
+  if (!sellerReq) {
+    return null;
+  }
   return (
     <div className='sell-div'>
       <div className="seller-review-header">

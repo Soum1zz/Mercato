@@ -1,101 +1,177 @@
-.sell-div{
-    width: min(70vw, 1050px);
-    margin: 0 auto;
-    height: min-content;
-    padding: 5rem;
+.sell-div {
+    width: min(1060px, calc(100% - 3rem));
+    margin: 3rem auto;
+    padding: 3rem;
     display: flex;
-    gap: 3rem;
-    justify-content:center;
-    font-size: 25px;
-    color: rgba(60, 61, 61, 0.877);
-    border: 1px solid rgba(0, 0, 0, 0.3);
     flex-direction: column;
+    gap: 2rem;
+    color: rgba(60, 61, 61, 0.92);
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 8px;
+    background: #fff;
 }
-.sell-img{
-    width: 200px;
-    height: 200px;
+
+.seller-review-header h1 {
+    margin: 0;
+    color: #2e2230;
+    font-size: 40px;
+}
+
+.seller-review-header p,
+.sell-doc p,
+.acc-div p {
+    margin: 0.5rem 0 0;
+    color: rgba(60, 61, 61, 0.72);
+    font-size: 18px;
+    line-height: 1.5;
+}
+
+.sell-img {
+    width: 150px;
+    height: 150px;
     border-radius: 50%;
-    background-color: #aa3a7fb9;
+    object-fit: cover;
+    background-color: rgba(107, 29, 77, 0.14);
+    border: 1px solid rgba(107, 29, 77, 0.18);
 }
-.acc-btn, .view-btn{
-    width:200px;
-    padding: 1rem;
-    color: aliceblue;
+
+.sell-det {
+    display: grid;
+    grid-template-columns: 180px minmax(0, 1fr);
+    align-items: center;
+    gap: 2rem;
+    padding: 1.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+}
+
+.seller-info-list {
+    display: grid;
+    gap: 0.85rem;
+    font-size: 18px;
+}
+
+.seller-info-list div {
+    display: grid;
+    grid-template-columns: 190px minmax(0, 1fr);
+    gap: 1rem;
+}
+
+.seller-info-list span {
+    color: #2e2230;
+    font-weight: 800;
+}
+
+.sell-doc {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+.sell-doc h2 {
+    margin: 0;
+    color: #2e2230;
+}
+
+.empty-doc {
+    color: rgba(60, 61, 61, 0.72);
+    font-size: 17px;
+}
+
+.cert-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1rem;
+}
+
+.cert-preview img {
+    width: min(520px, 100%);
+    max-height: 58vh;
+    object-fit: contain;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 8px;
+    background: #fff;
+}
+
+.acc-div {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+    padding: 1.5rem;
+    border: 1px solid rgba(107, 29, 77, 0.16);
+    border-radius: 8px;
+    background: #fbf8fa;
+    text-align: center;
+}
+
+.acc-btn-grp {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.acc-btn,
+.view-btn {
+    min-width: 150px;
+    padding: 0.85rem 1.1rem;
+    color: #fff;
     background: #6b1d4d;
-    border-radius: 5px;
+    border-radius: 6px;
     border: none;
-    font-size: 20px;
+    font-size: 16px;
+    font-weight: 700;
     cursor: pointer;
 }
-.view-btn{
-    width: 100px;
-    font-size: 13px;
-}
-.sell-det{
 
-    display: flex;
-    width: 100%;
-    align-items: center;
-    justify-content: center;
-    gap: 10rem;
+.view-btn {
+    min-width: 110px;
 }
-.acc-btn:hover{
-    
+
+.acc-btn:hover,
+.view-btn:hover {
     background: #5a173f;
-    box-shadow: 3px 3px gray;
-}
-.sell-doc{
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 2rem;
-}
-.acc-div{
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-.acc-btn-grp{
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 2rem;
-}
-
-@media (max-width: 1024px) {
-    .sell-div {
-        width: calc(100% - 3rem);
-        padding: 3rem 2rem;
-    }
-
-    .sell-det {
-        gap: 3rem;
-    }
+    box-shadow: 0 6px 16px rgba(107, 29, 77, 0.18);
 }
 
 @media (max-width: 760px) {
     .sell-div {
         width: calc(100% - 2rem);
-        padding: 1.5rem;
-        font-size: 20px;
+        margin: 1.5rem auto;
+        padding: 1.25rem;
+    }
+
+    .seller-review-header h1 {
+        font-size: 32px;
     }
 
     .sell-det,
-    .sell-doc,
-    .acc-btn-grp {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 1.25rem;
+    .sell-doc {
+        grid-template-columns: 1fr;
+        padding: 1.25rem;
     }
 
     .sell-img {
-        align-self: center;
-        width: 150px;
-        height: 150px;
+        justify-self: center;
+        width: 130px;
+        height: 130px;
+    }
+
+    .seller-info-list div {
+        grid-template-columns: 1fr;
+        gap: 0.25rem;
+    }
+
+    .cert-preview {
+        align-items: stretch;
     }
 
     .acc-btn,
