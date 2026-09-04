@@ -53,7 +53,7 @@ public class SecurityConfig {
                         "/auth/**",
                         "/api/user/*/image",
                         "/api/product/**",
-                        "/api/request-otp",   // ✅ ADD THIS
+                        "/api/request-otp",
                         "/api/verify-otp",
                         "/api/link-req",
                         "/api/reset-password").permitAll()

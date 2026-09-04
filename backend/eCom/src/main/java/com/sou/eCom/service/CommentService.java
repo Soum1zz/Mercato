@@ -115,7 +115,7 @@ public class CommentService {
     }
 
     public RatingResponse getRating(long productId) {
-        double rating= commentRepo.getRating(productId);
+        double rating= (double)Math.round(commentRepo.getRating(productId)*100)/100;
         long totalRating= commentRepo.getTotalRating(productId);
 
         return new RatingResponse(rating,totalRating);
