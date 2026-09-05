@@ -51,6 +51,7 @@ public class SecurityConfig {
                 .requestMatchers(
                         "/register",
                         "/auth/**",
+                        "/api/valid-email",
                         "/api/user/*/image",
                         "/api/product/**",
                         "/api/request-otp",

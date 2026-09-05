@@ -127,6 +127,10 @@
     cursor:pointer;
     color: rgba(20, 9, 37, 0.521);
 }
+.customer-empty-state {
+    min-height: 220px;
+    margin-top: 1rem;
+}
 
 @media (max-width: 1024px) {
     .customer-div {

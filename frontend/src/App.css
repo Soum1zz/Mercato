@@ -21,6 +21,21 @@ img {
     max-width: 100%;
 }
 
+.empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 260px;
+    padding: 2rem;
+    color: rgba(60, 61, 61, 0.72);
+    background: #fafafa;
+    border: 1px dashed rgba(107, 29, 77, 0.24);
+    border-radius: 8px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+}
+
 .wrapper{
 
     width: 100%;

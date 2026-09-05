@@ -26,8 +26,10 @@ public class PasswordResetController {
     @PostMapping("/link-req")
     public ResponseEntity<?> linkReq(@RequestBody ResetReq req) {
         try{
+
             prService.sendEmail(req.email());
-            return ResponseEntity.ok("Link sent to your email: " + req.email());
+            return ResponseEntity.ok("Link sent to your email: " + req.email()
+            );
         }catch(Exception e){
             e.printStackTrace();
             return ResponseEntity.badRequest().body(e.getMessage());

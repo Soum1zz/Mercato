@@ -37,7 +37,7 @@ public class PasswordResetService {
 
 
         mail.setTo(email);
-        mail.setSubject("Link for password reset");
+        mail.setSubject("Link for password reset/ email registration");
         mail.setText("Hello Mercato user your password reset link is: http://localhost:5173/reset-password?token=" + token);
 
         mailSender.send(mail);

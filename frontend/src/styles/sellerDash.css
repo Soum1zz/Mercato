@@ -151,6 +151,10 @@
     margin-top: 1rem;
 }
 
+.seller-empty-state {
+    margin-top: 1rem;
+}
+
 .seller-product-card {
     display: flex;
     flex-direction: column;

@@ -240,7 +240,9 @@ export default function SellerDash() {
                     {productsLoading ? (
                         <p>Loading your products...</p>
                     ) : sellerProducts.length === 0 ? (
-                        <p>Your listed products will appear here.</p>
+                        <div className="empty-state seller-empty-state">
+                            No products available.
+                        </div>
                     ) : (
                         <div className="seller-products-grid">
                             {sellerProducts.map((product) => (

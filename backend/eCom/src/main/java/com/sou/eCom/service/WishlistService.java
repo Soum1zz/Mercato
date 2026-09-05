@@ -50,9 +50,13 @@ public class WishlistService {
 
 
     public List<ProductResponse> getList(Long userId) {
-        Wishlist wishlist = wishlistRepo.findByUser_UserId(userId).orElseThrow(()->new RuntimeException("Wishlist not found!"));
-        List<Product>products= wishlist.getProducts();
         List<ProductResponse> productResponses=new ArrayList<>();
+        Wishlist wishlist = wishlistRepo.findByUser_UserId(userId).orElse(null);
+        if (wishlist == null || wishlist.getProducts() == null) {
+            return productResponses;
+        }
+
+        List<Product>products= wishlist.getProducts();
         for(Product product:products)
         {
             ProductResponse response= new ProductResponse(

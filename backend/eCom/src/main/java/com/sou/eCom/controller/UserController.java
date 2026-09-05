@@ -39,6 +39,16 @@ public class UserController {
         return (CsrfToken) request.getAttribute("_csrf");
     }
 
+    @GetMapping("/valid-email")
+    public ResponseEntity<?> validEmail(@RequestParam("email") String email){
+        try {
+            userRepo.findByEmail(email).orElseThrow(()->new RuntimeException("Email not found"));
+            return ResponseEntity.ok().build();
+        }catch (Exception e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getCurrentUser(@AuthenticationPrincipal UserPrincipal principal) {
         return new ResponseEntity<>(userService.getUser(principal.getUser().getUserId()), HttpStatus.OK );

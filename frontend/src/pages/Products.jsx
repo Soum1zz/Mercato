@@ -88,6 +88,10 @@ export default function Products() {
                     <div className="prod-loader">
                         <Loader className="inline-loader" />
                     </div>
+                ) : products.length === 0 ? (
+                    <div className="empty-state">
+                        No products available.
+                    </div>
                 ) : (
                     <div className="all-prods">
                         {

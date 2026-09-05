@@ -13,7 +13,7 @@ export default function Authenticate() {
   // const [signupForm, setSignUpForm] = useState(null);
 
   const navigate = useNavigate();
-  const [Link,setLink] = useState(false);
+  const [Link, setLink] = useState(false);
   const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [passwordData, setPasswordData] = useState({
@@ -62,7 +62,23 @@ export default function Authenticate() {
   const requestOtp = async () => {
     setLoading(true);
     localStorage.setItem("email", email);
-
+    try {
+      const res = await fetch(
+        `http://localhost:8080/api/valid-email?email=${encodeURIComponent(email)}`,
+        {
+          method: "GET",
+        },
+      );
+      if (res.status == 200) {
+        toast.error("email already exists");
+        navigate("/auth");
+        setLoading(false);
+        setStep("login");
+        return;
+      }
+    } catch (e) {
+      console.log(e);
+    }
     try {
       const resp = await fetch("http://localhost:8080/api/request-otp", {
         method: "POST",
@@ -90,7 +106,24 @@ export default function Authenticate() {
   const requestResetLink = async () => {
     setLoading(true);
     localStorage.setItem("email", email);
-
+    try {
+      const res = await fetch(
+        `http://localhost:8080/api/valid-email?email=${encodeURIComponent(email)}`,
+        {
+          method: "GET",
+        },
+      );
+      if (res.status !== 200) {
+        const message = await res.text();
+        toast.error(message || "Email not found");
+        navigate("/auth");
+        setLoading(false);
+        setStep("login");
+        return;
+      }
+    } catch (e) {
+      console.log(e);
+    }
     try {
       const resp = await fetch("http://localhost:8080/api/link-req", {
         method: "POST",
@@ -113,7 +146,6 @@ export default function Authenticate() {
     }
   };
 
- 
   return (
     <div className="auth-div">
       {loading && (
@@ -167,7 +199,7 @@ export default function Authenticate() {
             } finally {
               setLoading(false);
             }
-          } else if(step === "login") {
+          } else if (step === "login") {
             setLoading(true);
             const payLoad = {
               email: rawFormData.get("email"),
@@ -372,7 +404,12 @@ export default function Authenticate() {
             <div className="form-group">
               <label>
                 Email:
-                <input type="email" placeholder="abc@gmail.com" name="email" required={true}/>
+                <input
+                  type="email"
+                  placeholder="abc@gmail.com"
+                  name="email"
+                  required={true}
+                />
               </label>
               <label>
                 Password:
@@ -394,11 +431,12 @@ export default function Authenticate() {
                 </button>
               </label>
             </div>
-            <div className="auth-sub-text" 
-            onClick={()=>{
-              setStep("email");
-              setLink(true);
-            }}
+            <div
+              className="auth-sub-text"
+              onClick={() => {
+                setStep("email");
+                setLink(true);
+              }}
             >
               Forgot Password?
             </div>
@@ -435,29 +473,29 @@ export default function Authenticate() {
               />
             </label>
 
-            {
-            Link==false&&<button
-              type="button"
-              onClick={requestOtp}
-              className="auth-btn"
-              disabled={loading}
-            >
-              Get OTP
-            </button>
-            }
-            {
-              Link==true&&<button
-              type="button"
-              onClick={requestResetLink}
-              className="auth-btn"
-              disabled={loading}
-            >
-              Get Link
-            </button>
-            }
+            {Link == false && (
+              <button
+                type="button"
+                onClick={requestOtp}
+                className="auth-btn"
+                disabled={loading}
+              >
+                Get OTP
+              </button>
+            )}
+            {Link == true && (
+              <button
+                type="button"
+                onClick={requestResetLink}
+                className="auth-btn"
+                disabled={loading}
+              >
+                Get Link
+              </button>
+            )}
           </div>
         )}
-        {step === "otp" && <OtpInput setStep={setStep}/>}
+        {step === "otp" && <OtpInput setStep={setStep} />}
       </form>
     </div>
   );

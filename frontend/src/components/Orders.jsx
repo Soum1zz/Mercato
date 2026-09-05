@@ -34,25 +34,31 @@ export default function Orders() {
       }
     };
     fetchWish();
-  }, []);
+  }, [navigate]);
   return (
     <div className="orders-wrapper">
       <h2>My Orders</h2>
-      <div className="order-card">
-        <div className="order-row order-header">
-          <span>Order id</span>
-          <span>Order date</span>
-          <span>Status</span>
-          <span>Total</span>
-          <span></span>
+      {Array.isArray(orders) && orders.length === 0 ? (
+        <div className="empty-state customer-empty-state">
+          No orders yet.
         </div>
+      ) : (
+        <div className="order-card">
+          <div className="order-row order-header">
+            <span>Order id</span>
+            <span>Order date</span>
+            <span>Status</span>
+            <span>Total</span>
+            <span></span>
+          </div>
 
-        <div>
-          {orders.map((order) => (
-            <OrderSub key={order.id} order={order} />
-          ))}
+          <div>
+            {Array.isArray(orders) && orders.map((order) => (
+              <OrderSub key={order.id} order={order} />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
