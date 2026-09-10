@@ -75,7 +75,7 @@ public class UserService {
             }
             OrderResponse orderResponse = new OrderResponse(
                     order.getId(),
-                    order.getStatus(),
+                    order.getStatus().toString(),
                     order.getOrderDate(),
                     order.getTotalAmount(),
                     itemResponses

@@ -1,25 +1,10 @@
 import axiosClient from "./axiosClient";
 
-export const getCustomers=()=> axiosClient.get('/customers');
+export const updateCustomerProfile = (data) =>
+  axiosClient.put("/api/me", data);
 
-export const getCustomerById= (id)=> axiosClient.get(`/customer/${id}`);
+export const updateCustomerImage = (userId, imgUrl) =>
+  axiosClient.put(`/api/user/${userId}/image`, { imgUrl });
 
-export const getCustomerOrders= (id)=> axiosClient.get(`/customer/${id}/orders`);
-
-export const getCustomerComments= (id)=> axiosClient.get(`/customer/${id}/comments`);
-
-export const addCustomer= (formData)=> axiosClient.post(`/customers`, formData,
-    {
-    headers: {
-            'Content-Type': 'multipart/form-data',
-        }
-});
-
-export const updateCustomer= (id, formData)=> axiosClient.put(`/customer/${id}`, formData,
-    {
-    headers: {
-            'Content-Type': 'multipart/form-data',
-        }
-});
-
-export const deleteCustomer= (id)=> axiosClient.delete(`/customer/${id}`);
+export const getCustomerWishlist = () =>
+  axiosClient.get("/api/me/wishlist");

@@ -16,7 +16,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin("http://localhost:5173")
 public class OrderController {
     @Autowired
     private OrderService service;
@@ -27,6 +26,7 @@ public class OrderController {
         List<OrderResponse> orderResponseList=service.getAllOrderResponses();
         return new ResponseEntity<>(orderResponseList, HttpStatus.OK);
     }
+
     @PostMapping("/me/orders")
     public ResponseEntity<OrderResponse> placeOrder(@AuthenticationPrincipal UserPrincipal principal, @RequestBody OrderRequest req){
         OrderResponse orderResponse =service.placeOrder(principal.getUser().getUserId() ,req);

@@ -6,9 +6,23 @@ import { IoStar,IoStarHalf,IoStarOutline } from "react-icons/io5";
 import { FiUpload } from "react-icons/fi";
 import Loader from "../components/Loader";
 import '../styles/productDetail.css'
-import { getCurrentUser, getToken } from "../auth/authService";
+import { getCurrentUser } from "../auth/authService";
 import toast from "react-hot-toast";
 import CommentBody from "../components/CommentBody";
+import {
+  getProductById,
+  getProductRating,
+  getProductComments,
+  addProductComment,
+  getUserCommentOnProduct,
+  checkWishlistStatus,
+  toggleWishlist,
+} from "../api/productApi";
+import { updateCart } from "../api/cartApi";
+import { createOrder } from "../api/orderApi";
+import { uploadToCloudinary } from "../api/uploadApi";
+import { updateSellerProduct, deleteSellerProduct } from "../api/sellerApi";
+
 export default function ProductDetail() {
     const { id } = useParams();
     const [product, setProduct] = useState(null);
@@ -31,41 +45,35 @@ export default function ProductDetail() {
     useEffect(()=>{
         const fetchOwnComment= async ()=>{
             if(!getCurrentUser())return;
-            const res= await fetch(`http://localhost:8080/api/product/${id}/user/comment`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${getToken()}`,
-                        },
-                    }
-            );
-            if (res.status === 404) return; // user never reviewed
-
-            if(!res.ok){
-                console.error(res.status);
+            try {
+                const res = await getUserCommentOnProduct(id);
+                const comData = res.data;
+                setYourCommentData(comData);
+                setYourReview(comData.desc);
+                setYourRating(comData.rating);
+                setImgPreview(comData.imgUrl);
+            } catch (err) {
+                if (err.response?.status === 404) return; // user never reviewed
+                console.error(err.response?.status);
                 toast.error("Cant fetch your comment");
             }
-            const comData= await res.json();
-            setYourCommentData(comData);
-            setYourReview(comData.desc);
-            setYourRating(comData.rating);
-            setImgPreview(comData.imgUrl)
-
         }
         fetchOwnComment();
     },[id])
     useEffect(() => {
         const fetchProduct = async () => {
-            const response = await fetch(`http://localhost:8080/api/product/${id}`);
-            const data = await response.json();
-            setProduct(data);
+            try {
+                const response = await getProductById(id);
+                setProduct(response.data);
 
-            const ratRes= await fetch(`http://localhost:8080/api/product/${id}/rating`);
-            const ratData = await ratRes.json();
-            setRating(ratData);
+                const ratRes = await getProductRating(id);
+                setRating(ratRes.data);
 
-            const comRes = await fetch(`http://localhost:8080/api/product/${id}/comments`);
-            const comData = await comRes.json();
-            setcomments(comData);
+                const comRes = await getProductComments(id);
+                setcomments(comRes.data);
+            } catch (e) {
+                console.error("Failed to load product details", e);
+            }
         };
 
         fetchProduct();
@@ -87,18 +95,8 @@ export default function ProductDetail() {
                 return;
             }
             try {
-                const res = await fetch(
-                    `http://localhost:8080/api/me/product/${product.id}/wishlist`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${getToken()}`,
-                        },
-                    }
-                );
-                if (!res.ok) throw new Error();
-                const data = await res.json();
-                setWishlisted(data.wishlisted);
-
+                const res = await checkWishlistStatus(product.id);
+                setWishlisted(res.data.wishlisted);
             } catch (e) {
                 console.error(e)
             }
@@ -107,113 +105,63 @@ export default function ProductDetail() {
     }, [product?.id]);
 
 
-    const imgUploadHandler= async(e)=>{
-    const file = e.target.files[0];
-    if (!file) return;
-    const data = new FormData();
-    data.append("file", file);
-    data.append("upload_preset", "Mercato");
-    data.append("cloud_name", "dp5zhfxsl");
+    const imgUploadHandler = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
 
-    try {
-      const res = await fetch(
-        "https://api.cloudinary.com/v1_1/dp5zhfxsl/image/upload",
-        {
-          method: "POST",
-          body: data,
-        },
-      );
-
-      const jsonData = await res.json();
-      console.log(jsonData);
-
-      setImgPreview(jsonData.secure_url);
-    } catch (e) {
-      console.error("Image upload failed", e);
-    }
-  };
+        try {
+            const secureUrl = await uploadToCloudinary(file);
+            setImgPreview(secureUrl);
+        } catch (e) {
+            console.error("Image upload failed", e);
+        }
+    };
     
-    const submitHandler= async(e)=>{e.preventDefault();
+    const submitHandler = async (e) => {
+        e.preventDefault();
         const form = e.currentTarget;
         const rawFormData = new FormData(form);
-        if(!getCurrentUser()){navigate("/auth");return;}
-        const CommentData = {
-            desc:rawFormData.get("desc"),
-            rating:yourRating,
-            imgUrl:imgPreview
-          };
-          try {
-            const response = await fetch(
-              `http://localhost:8080/api/product/${product.id}/comments`,
-              {
-                method: "POST",
-                headers: {
-                 "Content-Type": "application/json",
-                  Authorization: `Bearer ${getToken()}`,
-                },
-                body: JSON.stringify(CommentData),
-              },
-            );
-
-            if (response.ok) {
-              const result = await response.json();
-              console.log("Success:", result);
-              toast.success("Comment added!");
-              setShowReviewBox(false);
-              setYourRating(0);
-              setYourReview("");
-              const ratRes = await fetch(`http://localhost:8080/api/product/${product.id}/rating`);
-              const ratData = await ratRes.json();
-              setRating(ratData);
-
-              const comRes= await fetch(`http://localhost:8080/api/product/${product.id}/comments`);
-              const comData= await comRes.json();
-              setcomments(comData)
-
-            } else {
-              const errorText = await response.text();
-              console.error(
-                "Server Error Status:",
-                response.status,
-                "Message:",
-                errorText,
-              );
-              toast.error("Comment not added!");
-            }
-          } catch (e) {
-            console.error("Network Error:", e);
-          }
+        if (!getCurrentUser()) {
+            navigate("/auth");
+            return;
         }
+        const CommentData = {
+            desc: rawFormData.get("desc"),
+            rating: yourRating,
+            imgUrl: imgPreview,
+        };
+        try {
+            const response = await addProductComment(product.id, CommentData);
+            console.log("Success:", response.data);
+            toast.success("Comment added!");
+            setShowReviewBox(false);
+            setYourRating(0);
+            setYourReview("");
+            const ratRes = await getProductRating(product.id);
+            setRating(ratRes.data);
 
-    
+            const comRes = await getProductComments(product.id);
+            setcomments(comRes.data);
+        } catch (e) {
+            console.error("Network Error:", e);
+            toast.error("Comment not added!");
+        }
+    };
 
     const wishlistHandler = async () => {
         try {
-            const method = isWishlisted ? "DELETE" : "PUT";
-            const res = await fetch(`http://localhost:8080/api/me/product/${product.id}/wishlist`,
-                {
-                    method,
-                    headers: {
-                        Authorization: `Bearer ${getToken()}`,
-                    },
-                }
-            )
-            if (!res.ok) {
-                throw new Error("Failed adding to wishlist")
-            }
+            await toggleWishlist(product.id, isWishlisted);
             toast.success(
                 isWishlisted ?
                     "Removed from wishlist" :
                     "Added to wishlist");
+            setWishlisted(!isWishlisted);
         } catch (e) {
             console.error(e);
-            toast.error("Check console")
+            toast.error("Check console");
         }
+    };
 
-
-        setWishlisted(!isWishlisted);
-
-    }
     const addToCartHandler = async () => {
         if (!getCurrentUser()) {
             toast.error("You need to login");
@@ -223,26 +171,16 @@ export default function ProductDetail() {
         const payload = {
             productId: product.id,
             quantity: count
-        }
+        };
         try {
-            const res = await fetch("http://localhost:8080/api/me/cart",
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${getToken()}`,
-                    },
-                    body: JSON.stringify(payload)
-                }
-            )
-            if (!res.ok) {
-                throw new Error("Failed adding to cart")
-            }
+            await updateCart(payload);
             toast.success("Added to cart");
         } catch (e) {
             console.error(e);
+            toast.error("Failed adding to cart");
         }
-    }
+    };
+
     const orderHandler = async () => {
         if (!getCurrentUser()) {
             toast.error("You need to login");
@@ -252,30 +190,18 @@ export default function ProductDetail() {
         const orderItem = {
             productId: product.id,
             productQuantity: count
-        }
+        };
         const payload = {
             items: [orderItem]
-        }
+        };
         try {
-            const res = await fetch("http://localhost:8080/api/me/orders",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${getToken()}`,
-                    },
-                    body: JSON.stringify(payload)
-                }
-            )
-            if (!res.ok) {
-                throw new Error("Failed to order")
-            }
+            await createOrder(payload);
             toast.success("Congratulations you have successfully ordered!");
         } catch (e) {
             console.error(e);
+            toast.error("Failed to order");
         }
-
-    }
+    };
     const imageUrl = `http://localhost:8080/api/product/${id}/image`
     if (!product) return <Loader/>
 
@@ -315,24 +241,13 @@ export default function ProductDetail() {
                             dataToSend.append("image", imageFile);
                         }
                         try {
-                            const response = await fetch(`http://localhost:8080/api/product/${product.id}`,
-                                {
-                                    method: "PUT",
-                                    body: dataToSend,
-                                });
-
-                            if (response.ok) {
-                                const result = await response.json();
-                                console.log("Success:", result);
-                                alert("Product updated!");
-                                setEdit(false);
-                            } else {
-                                const errorText = await response.text();
-                                console.error("Server Error Status:", response.status, "Message:", errorText);
-                                alert(`Failed with status ${response.status}. Check backend logs.`);
-                            }
+                            const response = await updateSellerProduct(product.id, ProductData);
+                            console.log("Success:", response.data);
+                            alert("Product updated!");
+                            setEdit(false);
                         } catch (e) {
                             console.error("Network Error:", e);
+                            alert("Failed to update product.");
                         }
 
                     }}>
@@ -377,22 +292,13 @@ export default function ProductDetail() {
                 </form>
                 <button onClick={async () => {
                     try {
-                        const response = await fetch(`http://localhost:8080/api/product/${product.id}`,
-                            {
-                                method: "DELETE",
-                            });
-
-                        if (response.ok) {
-
-                            console.log("Product Deleted");
-                            alert("Product Deleted!");
-                            navigate("/");
-                        } else {
-
-                            alert("Failed to delete.");
-                        }
+                        await deleteSellerProduct(product.id);
+                        console.log("Product Deleted");
+                        alert("Product Deleted!");
+                        navigate("/");
                     } catch (e) {
                         console.error("Network Error:", e);
+                        alert("Failed to delete.");
                     }
                 }}>delete Product</button>
             </div>)

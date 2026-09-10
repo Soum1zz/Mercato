@@ -1,5 +1,6 @@
 package com.sou.eCom.model;
 
+import com.sou.eCom.Status.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,15 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class Order {
-    public  enum OrderStatus {
-        PENDING,
-        PLACED,
-        CONFIRMED,
-        SHIPPED,
-        DELIVERED,
-        CANCELLED,
-        RETURNED
-    }
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +25,8 @@ public class Order {
 //    @Column(unique = true)
 //    private String orderId;
 
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = OrderStatusConverter.class)
+    @Column(name = "status", length = 50)
     private OrderStatus status;
     private LocalDate orderDate;
     private double totalAmount;
@@ -43,5 +37,8 @@ public class Order {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+
+
 
 }

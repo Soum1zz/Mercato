@@ -20,4 +20,19 @@ public class GlobalExceptionHandler {
                         "message", "Email already exists"
                 ));
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<?> handleRuntimeException(RuntimeException exception) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", exception.getMessage() != null ? exception.getMessage() : "Unknown error"));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<?> handleGenericException(Exception exception) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", exception.getClass().getSimpleName() + ": " + exception.getMessage()));
+    }
 }
+

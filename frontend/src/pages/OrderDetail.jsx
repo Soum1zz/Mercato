@@ -2,24 +2,22 @@ import '../styles/orderDetail.css'
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import OrderItemSub from "../components/OrderItemSub"
 import { useEffect, useState } from "react";
-import { getCurrentUser } from "../auth/authService";
+import { getOrderById } from "../api/orderApi";
 
 export default function OrderDetail(){
     const navigate= useNavigate()
     const location= useLocation()
     const {orderId}=useParams();
     const [order, setOrder]=useState(location.state||null)
-    // if(getCurrentUser()){
-    //     navigate("/auth")
-    //     return;
-    // }
     useEffect(() => {
     if(!order)
         {const fetchOrder = async () => {
-            const response = await fetch(`http://localhost:8080/api/orders/${orderId}`);
-            const data = await response.json();
-            setOrder(data);
-
+            try {
+                const response = await getOrderById(orderId);
+                setOrder(response.data);
+            } catch(e) {
+                console.error("Failed to fetch order:", e);
+            }
         };
 
         fetchOrder();}

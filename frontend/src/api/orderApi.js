@@ -1,9 +1,10 @@
 import axiosClient from "./axiosClient";
 
-export const getCustomerOrders= (id)=> axiosClient.get(`/customer/${id}/orders`);
+export const getUserOrders = () =>
+  axiosClient.get("/api/me/orders");
 
-export const placeorder= (id, FormData)=> axiosClient.post(`/customer/${id}/orders`, FormData);
+export const getOrderById = (id) =>
+  axiosClient.get(`/api/orders/${id}`);
 
-export const getOrderById= (id)=> axiosClient.get(`/orders/${id}`);
-
-export const deleteOrder= (id)=> axiosClient.delete(`/orders/${id}`);
+export const createOrder = (orderData) =>
+  axiosClient.post("/api/me/orders", orderData);

@@ -1,5 +1,7 @@
 package com.sou.eCom.service;
 
+import com.sou.eCom.Status.OrderStatus;
+import com.sou.eCom.Status.PaymentStatus;
 import com.sou.eCom.model.*;
 import com.sou.eCom.model.dto.CartDto.CartItemResponse;
 import com.sou.eCom.model.dto.CartDto.CartResponse;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +28,8 @@ public class CartService {
     OrderRepo orderRepo;
     @Autowired
     UserRepo userRepo;
+    @Autowired
+    PaymentRepo paymentRepo;
     public void deleteCart(Long userId) {
         cartRepo.delete(cartRepo.findByUser_UserId(userId).orElseThrow(()->new RuntimeException("cart not found")));
     }
@@ -67,7 +72,7 @@ public class CartService {
         }
         OrderResponse orderResponse = new OrderResponse(
                 order.getId(),
-                order.getStatus(),
+                order.getStatus().toString(),
                 order.getOrderDate(),
                 order.getTotalAmount(),
                 itemResponses
@@ -156,12 +161,39 @@ public class CartService {
         order.setUser(cart.getUser());
         order.setOrderDate(LocalDate.now());
         order.setOrderItems(orderItems);
-        order.setStatus(Order.OrderStatus.PLACED);
+        order.setStatus(OrderStatus.PLACED);
         order.setTotalAmount(totalPrice);
         orderItems.forEach(item -> item.setOrder(order));
-        Order savedOrder=orderRepo.save(order);
+        Order savedOrder = orderRepo.save(order);
 
         cart.getItems().clear();
+        cartRepo.save(cart);
         return toOrderResponse(savedOrder);
+    }
+
+    /**
+     * Places an order from the cart AND records a Payment row in one transaction.
+     * Called after Razorpay signature has been verified by the controller.
+     */
+    @Transactional
+    public OrderResponse postOrderWithPayment(Long userId, double amount,
+                                              String razorpayOrderId, String razorpayPaymentId) {
+        OrderResponse orderResponse = postOrder(userId);
+
+        // Reload the saved order so we can link it to the payment
+        Order savedOrder = orderRepo.findById(orderResponse.id())
+                .orElseThrow(() -> new RuntimeException("Order not found after placement"));
+
+        Payment payment = Payment.builder()
+                .order(savedOrder)
+                .amount(amount)
+                .status(PaymentStatus.SUCCESS)
+                .date(LocalDateTime.now())
+                .razorpayOrderId(razorpayOrderId)
+                .razorpayPaymentId(razorpayPaymentId)
+                .build();
+
+        paymentRepo.save(payment);
+        return orderResponse;
     }
 }

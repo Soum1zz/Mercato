@@ -1,5 +1,6 @@
 package com.sou.eCom.service;
 
+import com.sou.eCom.Status.OrderStatus;
 import com.sou.eCom.model.Order;
 import com.sou.eCom.model.OrderItem;
 import com.sou.eCom.model.Product;
@@ -16,9 +17,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import com.sou.eCom.model.Payment;
+import com.sou.eCom.repo.PaymentRepo;
+import com.sou.eCom.Status.PaymentStatus;
+import com.sou.eCom.service.PaymentService;
 
 @Service
 public class OrderService {
@@ -28,6 +35,10 @@ public class OrderService {
     private OrderRepo orderRepo;
     @Autowired
     private UserRepo userRepo;
+    @Autowired
+    private PaymentRepo paymentRepo;
+    @Autowired
+    private PaymentService paymentService;
 
 
     public List<OrderResponse> getAllOrderResponses() {
@@ -54,7 +65,7 @@ public class OrderService {
         }
         OrderResponse orderResponse = new OrderResponse(
                 order.getId(),
-                order.getStatus(),
+                order.getStatus().toString(),
                 order.getOrderDate(),
                 order.getTotalAmount(),
                 itemResponses
@@ -69,7 +80,7 @@ public class OrderService {
         Order order = new Order();
 
         order.setUser(user);
-        order.setStatus(Order.OrderStatus.PLACED);
+        order.setStatus(OrderStatus.PLACED);
         order.setOrderDate(LocalDate.now());
         double total=0;
         List<OrderItem> orderItems = new ArrayList<>();
@@ -81,6 +92,7 @@ public class OrderService {
                         "Insufficient stock for product: " + product.getName()
                 );
             }
+
             product.setStock(product.getStock()-itemReq.productQuantity());
 
             OrderItem orderItem = OrderItem.builder()
@@ -95,6 +107,25 @@ public class OrderService {
         order.setTotalAmount(total);
         order.setOrderItems(orderItems);
         Order savedOrder = orderRepo.save(order);
+
+        // create razorpay order and persist Payment linked to this Order
+        try {
+            String receipt = "rec_" + savedOrder.getId();
+            String razorpayOrderId = paymentService.createOrder(total, "INR", receipt);
+
+            Payment payment = Payment.builder()
+                    .order(savedOrder)
+                    .amount(total)
+                    .status(PaymentStatus.PENDING)
+                    .date(LocalDateTime.now())
+                    .razorpayOrderId(razorpayOrderId)
+                    .build();
+
+            paymentRepo.save(payment);
+        } catch (Exception e) {
+            // log and continue; payment will be attempted separately
+            e.printStackTrace();
+        }
 
        return toOrderResponse(savedOrder);
 

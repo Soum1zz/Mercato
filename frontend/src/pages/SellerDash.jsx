@@ -1,10 +1,12 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useState, useMemo } from "react"
 import veriImg from "../assets/seller-sec.png"
 import '../styles/sellerDash.css'
 import SellerForm from "../components/SellerForm";
-import { getToken, isTokenExpired, logout } from "../auth/authService";
+import { getToken, isTokenExpired, logout, fetchUserProfile, fetchSellerDetails } from "../auth/authService";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { getSellerProducts, updateSellerProduct } from "../api/sellerApi";
+import { uploadToCloudinary } from "../api/uploadApi";
 export default function SellerDash() {
     const [user, setUser] = useState(null);
     const [sellDet, setSell] = useState(null);
@@ -25,46 +27,20 @@ export default function SellerDash() {
     const fetchSellerProducts = useCallback(async (sellerId) => {
         setProductsLoading(true);
         try {
-            const res = await fetch(`http://localhost:8080/seller/${sellerId}/products`, {
-                headers: {
-                    Authorization: `Bearer ${getToken()}`,
-                },
-            });
-            if (res.status === 401) {
+            const res = await getSellerProducts(sellerId);
+            setSellerProducts(res.data);
+        } catch (e) {
+            if (e.response?.status === 401) {
                 logout();
                 navigate("/auth");
                 return;
             }
-            if (!res.ok) {
-                throw new Error(`Http error! status: ${res.status}`);
-            }
-            const data = await res.json();
-            setSellerProducts(data);
-        } catch (e) {
             console.error("Failed to fetch seller products", e);
             toast.error("Could not load your products");
         } finally {
             setProductsLoading(false);
         }
     }, [navigate]);
-
-    const uploadProductImage = async (file) => {
-        if (!file || file.size === 0) return null;
-        const data = new FormData();
-        data.append("file", file);
-        data.append("upload_preset", "Mercato");
-        data.append("cloud_name", "dp5zhfxsl");
-
-        const res = await fetch("https://api.cloudinary.com/v1_1/dp5zhfxsl/image/upload", {
-            method: "POST",
-            body: data,
-        });
-        if (!res.ok) {
-            throw new Error("Image upload failed");
-        }
-        const jsonData = await res.json();
-        return jsonData.secure_url;
-    };
 
     const updateProductHandler = async (e) => {
         e.preventDefault();
@@ -75,7 +51,7 @@ export default function SellerDash() {
         const rawFormData = new FormData(form);
 
         try {
-            const imageUrl = await uploadProductImage(rawFormData.get("image"));
+            const imageUrl = await uploadToCloudinary(rawFormData.get("image"));
             const productData = {
                 name: rawFormData.get("name"),
                 description: rawFormData.get("description"),
@@ -87,21 +63,8 @@ export default function SellerDash() {
                 imgUrl: imageUrl,
             };
 
-            const response = await fetch(`http://localhost:8080/seller/product/${editingProduct.id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${getToken()}`,
-                },
-                body: JSON.stringify(productData),
-            });
-
-            if (!response.ok) {
-                const message = await response.text();
-                throw new Error(message || "Product update failed");
-            }
-
-            const updatedProduct = await response.json();
+            const response = await updateSellerProduct(editingProduct.id, productData);
+            const updatedProduct = response.data;
             setSellerProducts((prev) =>
                 prev.map((product) => product.id === updatedProduct.id ? updatedProduct : product)
             );
@@ -119,43 +82,25 @@ export default function SellerDash() {
         if (!user?.userId) return;
         const fetchUserDet = async () => {
             try {
-                const resUser = await fetch(`http://localhost:8080/seller/${user.userId}/details`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${getToken()}`,
-                        },
-                    }
-                );
-                if (resUser.status === 401) {
-                    logout();
-                    navigate("/auth");
-                    return;
+                const data = await fetchSellerDetails(user.userId);
+                if (data) {
+                    setSell(data);
                 }
-                if (!resUser.ok) {
-                    throw new Error(`Http error! status: ${resUser.status}`)
-                }
-
-
-                const data = await resUser.json();
-                setSell(data);
-                console.log(data?.status)
-
             } catch (e) {
-                console.error("Failed to fetch user", e);
-
+                console.error("Failed to fetch seller details", e);
             }
-
-        }
+        };
         fetchUserDet();
-    }, [navigate, user?.userId])
+    }, [navigate, user?.userId]);
+
     useEffect(() => {
         if (user?.userId && sellDet?.status === "APPROVED") {
             fetchSellerProducts(user.userId);
         }
     }, [fetchSellerProducts, sellDet?.status, user?.userId]);
+
     useEffect(() => {
         const fetchUser = async () => {
-            console.log(getToken());
             if (!getToken()) {
                 navigate("/auth");
                 return;
@@ -166,46 +111,82 @@ export default function SellerDash() {
                 return;
             }
             try {
-                const resUser = await fetch("http://localhost:8080/auth/me", {
-                    headers: {
-                        "Authorization": `Bearer ${getToken()}`,
-                        "Content-Type": "application/json"
-                    }
-                });
-                if (resUser.status === 401) {
-                    logout();
-                    navigate("/auth");
-                    return;
+                const data = await fetchUserProfile();
+                if (data) {
+                    setUser(data);
                 }
-                if (!resUser.ok) {
-                    throw new Error(`Http error! status: ${resUser.status}`)
-                }
-
-
-                const data = await resUser.json();
-                setUser(data);
             } catch (e) {
                 console.error("Failed to fetch user", e);
-
             }
-
-        }
+        };
         fetchUser();
     }, [navigate]);
+
+    // useMemo: memoize seller profile identity, verification status, and UI badges
+    const sellerProfile = useMemo(() => {
+        if (!user) return null;
+        const isApproved = sellDet?.status === "APPROVED";
+        const isPending = !sellDet || sellDet?.status === "PENDING";
+        const isRejected = sellDet?.status === "REJECTED";
+
+        return {
+            userId: user.userId,
+            name: user.name || "Seller",
+            email: user.email || "",
+            phoneNumber: user.phoneNumber || "",
+            address: user.address || "",
+            status: sellDet?.status || "PENDING",
+            isApproved,
+            isPending,
+            isRejected,
+            badgeText: isApproved ? "Verified seller" : isRejected ? "Verification rejected" : "Verification pending",
+            badgeClass: isApproved ? "approved" : "pending",
+            taxId: sellDet?.taxId || "",
+            description: sellDet?.description || "",
+        };
+    }, [user, sellDet]);
+
+    // useMemo: memoize costly calculation of seller product inventory stats
+    const sellerStats = useMemo(() => {
+        if (!sellerProducts || sellerProducts.length === 0) {
+            return { totalProducts: 0, inStockCount: 0, outOfStockCount: 0, totalStockUnits: 0 };
+        }
+        return sellerProducts.reduce(
+            (acc, prod) => {
+                const stock = Number(prod.stock) || 0;
+                acc.totalProducts += 1;
+                acc.totalStockUnits += stock;
+                if (stock > 0 && prod.status === "AVAILABLE") {
+                    acc.inStockCount += 1;
+                } else {
+                    acc.outOfStockCount += 1;
+                }
+                return acc;
+            },
+            { totalProducts: 0, inStockCount: 0, outOfStockCount: 0, totalStockUnits: 0 }
+        );
+    }, [sellerProducts]);
+
+    // useMemo: memoize sorted seller products to avoid re-sorting on every render
+    const sortedProducts = useMemo(() => {
+        if (!sellerProducts || sellerProducts.length === 0) return [];
+        return [...sellerProducts].sort((a, b) => (b.id || 0) - (a.id || 0));
+    }, [sellerProducts]);
+
     return (
         <div className="seller-div">
             <div className="seller-header">
                 <div>
-                    <h1>Hello {user?.name}</h1>
+                    <h1>Hello {sellerProfile?.name || user?.name}</h1>
                     <p>Manage your verification and product listings from one place.</p>
                 </div>
-                <span className={`seller-status ${sellDet?.status === "APPROVED" ? "approved" : "pending"}`}>
-                    {sellDet?.status === "APPROVED" ? "Verified seller" : "Verification pending"}
+                <span className={`seller-status ${sellerProfile?.badgeClass || "pending"}`}>
+                    {sellerProfile?.badgeText || "Verification pending"}
                 </span>
             </div>
-            <div className={`sell-veri-div ${sellDet?.status === "PENDING"||sellDet === null ? "" : "active"}`}>
+            <div className={`sell-veri-div ${sellerProfile?.isPending ? "" : "active"}`}>
                 {
-                    sellDet?.status === "PENDING"||sellDet === null
+                    sellerProfile?.isPending
                      ? (<div className="veri-stat">
                         <div className="veri-title">Your verification is pending</div>
                         <div>Please provide your business details to get verified and post your products.</div>
@@ -225,7 +206,7 @@ export default function SellerDash() {
                     <img src={veriImg} alt="Seller verification" />
                 </div>
             </div>
-            {sellDet?.status === "APPROVED" && <div className="seller-products-panel">
+            {sellerProfile?.isApproved && <div className="seller-products-panel">
                 <div className="add-btn-div">
                     <button className="add-btn"
                         onClick={() => {
@@ -237,6 +218,15 @@ export default function SellerDash() {
 
                 <div className="product-div">
                     <h2>Your Products</h2>
+                    <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", marginBottom: "1.5rem", color: "#666", fontSize: "14px" }}>
+                        <span>Total: <strong>{sellerStats.totalProducts}</strong></span>
+                        <span>•</span>
+                        <span>In Stock: <strong style={{ color: "#2e7d32" }}>{sellerStats.inStockCount}</strong></span>
+                        <span>•</span>
+                        <span>Out of Stock: <strong style={{ color: "#d32f2f" }}>{sellerStats.outOfStockCount}</strong></span>
+                        <span>•</span>
+                        <span>Total Units: <strong>{sellerStats.totalStockUnits}</strong></span>
+                    </div>
                     {productsLoading ? (
                         <p>Loading your products...</p>
                     ) : sellerProducts.length === 0 ? (
@@ -245,7 +235,7 @@ export default function SellerDash() {
                         </div>
                     ) : (
                         <div className="seller-products-grid">
-                            {sellerProducts.map((product) => (
+                            {sortedProducts.map((product) => (
                                 <div className="seller-product-card" key={product.id}>
                                     <img
                                         src={`http://localhost:8080/api/product/${product.id}/image`}

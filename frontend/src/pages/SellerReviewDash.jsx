@@ -2,6 +2,8 @@ import {  useLocation, useNavigate } from 'react-router-dom';
 import '../styles/sellerReqDash.css'
 import { useEffect, useState } from 'react';
 import { getToken, isTokenExpired } from '../auth/authService';
+import { approveSeller, getSellerCertificate } from '../api/adminApi';
+
 export default function SellerReviewDash() {
   const { state } = useLocation();
   const navigate = useNavigate();
@@ -9,20 +11,12 @@ export default function SellerReviewDash() {
   const [showCert, setCert] = useState(false);
   const [certImg, setCertImg] = useState(null);
   const verifyHandler= async()=>{
-    try{const res= await fetch(`http://localhost:8080/admin/sellers/${sellerReq.userId}/approve`,
-      {method:"PUT",
-      headers: {
-        "Authorization": `Bearer ${getToken()}`,
-      }
+    try{
+      await approveSeller(sellerReq.userId);
+      navigate("/admin");
+    }catch(e){
+      console.error(e);
     }
-  );
-  if(!res.ok){
-    throw new Error("Verification error");
-  }
-  navigate("/admin");
-  }catch(e){
-     console.error(e);
-  }
     
   }
   const imgUrl = sellerReq ? `http://localhost:8080/api/user/${sellerReq.userId}/image` : null;
@@ -37,22 +31,13 @@ export default function SellerReviewDash() {
       return;
     }
     const fetchCert= async()=>{
-      try{ const res=await fetch(`http://localhost:8080/admin/seller/${sellerReq.userId}/certificate`,
-    {
-      headers: {
-        "Authorization": `Bearer ${getToken()}`,
+      try{
+        const res = await getSellerCertificate(sellerReq.userId);
+        setCertImg(res.data);
+      }catch(e){
+        console.error(e);
       }
-    }
-  );
-  if(!res.ok){
-    throw new Error("Failed to fetch certificates");
-  }
-  const url= await res.text();
-  setCertImg(url);
-    }catch(e){
-      console.error(e);
-    }
-  };
+    };
     
   fetchCert();
   

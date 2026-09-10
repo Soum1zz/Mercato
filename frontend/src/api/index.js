@@ -1,0 +1,10 @@
+export { default as axiosClient } from "./axiosClient";
+export * from "./authApi";
+export * from "./productApi";
+export * from "./cartApi";
+export * from "./orderApi";
+export * from "./customerApi";
+export * from "./sellerApi";
+export * from "./adminApi";
+export * from "./paymentApi";
+export * from "./uploadApi";

@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import "../styles/productForm.css";
-import { getToken } from "../auth/authService";
 import toast from "react-hot-toast";
+import { createSellerProduct } from "../api/sellerApi";
+import { uploadToCloudinary } from "../api/uploadApi";
+
 export default function ProductForm() {
   const categories = [
     "Electronics",
@@ -21,32 +23,13 @@ export default function ProductForm() {
 
           const form = e.currentTarget;
           const rawFormData = new FormData(form);
-          let imageUrl=null;
-          
-
-          
+          let imageUrl = null;
 
           const file = form.querySelector('input[type="file"]').files[0];
 
           if (file) {
-            const data = new FormData();
-            data.append("file", file);
-            data.append("upload_preset", "Mercato");
-            data.append("cloud_name", "dp5zhfxsl");
-
             try {
-              const res = await fetch(
-                "https://api.cloudinary.com/v1_1/dp5zhfxsl/image/upload",
-                {
-                  method: "POST",
-                  body: data,
-                },
-              );
-
-              const jsonData = await res.json();
-
-              imageUrl=jsonData.secure_url;
-
+              imageUrl = await uploadToCloudinary(file);
             } catch (e) {
               console.error("Image upload failed", e);
             }
@@ -62,36 +45,14 @@ export default function ProductForm() {
             imgUrl: imageUrl
           };
           try {
-            const response = await fetch(
-              "http://localhost:8080/seller/products",
-              {
-                method: "POST",
-                headers: {
-                 "Content-Type": "application/json",
-                  Authorization: `Bearer ${getToken()}`,
-                },
-                body: JSON.stringify(ProductData),
-              },
-            );
-
-            if (response.ok) {
-              const result = await response.json();
-              console.log("Success:", result);
-              toast.success("Product added!");
-              form.reset();
-              navigate("/seller");
-            } else {
-              const errorText = await response.text();
-              console.error(
-                "Server Error Status:",
-                response.status,
-                "Message:",
-                errorText,
-              );
-              toast.error("Product not added!");
-            }
+            const response = await createSellerProduct(ProductData);
+            console.log("Success:", response.data);
+            toast.success("Product added!");
+            form.reset();
+            navigate("/seller");
           } catch (e) {
             console.error("Network Error:", e);
+            toast.error("Product not added!");
           }
         }}
       >

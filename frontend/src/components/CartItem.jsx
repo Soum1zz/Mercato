@@ -1,23 +1,14 @@
 
 import toast from "react-hot-toast";
 import { RiDeleteBinLine } from "react-icons/ri";
-import { getToken } from "../auth/authService";
+import { deleteCartItem } from "../api/cartApi";
+
 export default function CartItem({ cartItem, setCart }) {
     const imageUrl = `http://localhost:8080/api/product/${cartItem.productId}/image`
 
     const deleteCartHandler = async () => {
-        try{const res = await fetch(`http://localhost:8080/api/me/cart/items/${cartItem.productId}`,
-            {
-                method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${getToken()}`,
-                },
-            }
-        )
-
-        if(!res.ok){
-            toast.error("Cart can't be updated");
-        }
+        try {
+            await deleteCartItem(cartItem.productId);
             toast.success("Cart updated");
             setCart((prev)=>({
                 ...prev,
@@ -26,10 +17,9 @@ export default function CartItem({ cartItem, setCart }) {
                 ),
                 totalPrice: (prev.totalPrice-cartItem.totalPrice)
             }));
-
-    }
-        catch(e){
+        } catch(e) {
             console.log(e);
+            toast.error("Cart can't be updated");
         }
     }
 

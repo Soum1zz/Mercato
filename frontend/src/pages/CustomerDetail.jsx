@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import "../styles/customer.css";
 import { FaCamera } from "react-icons/fa";
 import { FaBagShopping } from "react-icons/fa6";
@@ -7,8 +7,10 @@ import { TbUserFilled } from "react-icons/tb";
 import Wishlist from "../components/Wishlist";
 import CustomerForm from "../components/CustomerForm";
 import Orders from "../components/Orders";
-import { getToken, isTokenExpired, logout } from "../auth/authService";
+import { getToken, isTokenExpired, logout, fetchUserProfile } from "../auth/authService";
 import { useNavigate } from "react-router-dom";
+import { updateCustomerImage } from "../api/customerApi";
+import { uploadToCloudinary } from "../api/uploadApi";
 export default function CustomerDetail() {
   const [content, setContent] = useState("CustomerForm");
   const [user, setUser] = useState(null);
@@ -26,35 +28,11 @@ export default function CustomerDetail() {
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const data = new FormData();
-    data.append("file", file);
-    data.append("upload_preset", "Mercato");
-    data.append("cloud_name", "dp5zhfxsl");
 
     try {
-      const res = await fetch(
-        "https://api.cloudinary.com/v1_1/dp5zhfxsl/image/upload",
-        {
-          method: "POST",
-          body: data,
-        },
-      );
-
-      const jsonData = await res.json();
-      console.log(jsonData);
-      try {
-        await fetch(`http://localhost:8080/api/user/${user.userId}/image`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${getToken()}`,
-          },
-          body: JSON.stringify({
-            imgUrl: jsonData.secure_url,
-          }),
-        });
-      } catch (e) {
-        console.error(e);
+      const secureUrl = await uploadToCloudinary(file);
+      if (secureUrl && user?.userId) {
+        await updateCustomerImage(user.userId, secureUrl);
       }
 
       const objUrl = URL.createObjectURL(file);
@@ -66,7 +44,6 @@ export default function CustomerDetail() {
   useEffect(() => {
     const fetchUser = async () => {
       setPreview(imgUrl);
-      console.log(getToken());
       if (!getToken()) {
         navigate("/auth");
         return;
@@ -77,35 +54,27 @@ export default function CustomerDetail() {
         return;
       }
       try {
-        const resUser = await fetch("http://localhost:8080/auth/me", {
-          headers: {
-            Authorization: `Bearer ${getToken()}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (resUser.status === 401) {
-          logout();
-          navigate("/auth");
-          return;
+        const data = await fetchUserProfile();
+        if (data) {
+          setUser(data);
+          setPreview(`http://localhost:8080/api/user/${data.userId}/image`);
         }
-        if (!resUser.ok) {
-          throw new Error(`Http error! status: ${resUser.status}`);
-        }
-
-        const data = await resUser.json();
-        setUser(data);
-        setPreview(`http://localhost:8080/api/user/${data.userId}/image`);
       } catch (e) {
         console.error("Failed to fetch user", e);
       }
     };
     fetchUser();
   }, [navigate]);
-  const userName = user?.name || "";
-  let Name = "";
-  if (userName.length > 18) Name = userName.substring(0, 18) + "...";
-  else Name = userName;
-  const name = userName?.charAt(0).toUpperCase() || "";
+
+  // useMemo: memoize truncated name and initial avatar character
+  const displayName = useMemo(() => {
+    const userName = user?.name || "";
+    return userName.length > 18 ? userName.substring(0, 18) + "..." : userName;
+  }, [user?.name]);
+
+  const avatarInitial = useMemo(() => {
+    return user?.name?.charAt(0).toUpperCase() || "";
+  }, [user?.name]);
 
   const [imgError, setImgError] = useState(false);
 
@@ -124,7 +93,7 @@ export default function CustomerDetail() {
             
           </div>
           ) : (
-            <div className="customer-img-fallback">{name}</div>
+            <div className="customer-img-fallback">{avatarInitial}</div>
           )}
           <div className="cam-icon" onClick={handleClick}>
                 <FaCamera />
@@ -138,7 +107,7 @@ export default function CustomerDetail() {
             onChange={handleImageChange}
             hidden
           />
-          <p>{user?.name}</p>
+          <p>{displayName}</p>
         </div>
         <div className="nav-sub">
           <div

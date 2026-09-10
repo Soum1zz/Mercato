@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import toast from "react-hot-toast";
 import Loader from "./Loader";
+import { verifyOtp as apiVerifyOtp } from "../api/authApi";
 
 export default function OtpInput({  setStep }) {
   const [otp, setOtp] = useState(new Array(6).fill(""));
@@ -57,24 +58,11 @@ export default function OtpInput({  setStep }) {
     }
 
     try {
-      const res = await fetch("http://localhost:8080/api/verify-otp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email
-          , otp: finalOtp }),
-      });
-
-      if (res.ok) {
-        toast.success("Your email is verified with Mercato!!")
-        setStep("signup") ;
-      } else {
-        toast.error("Invalid OTP");
-      }
+      await apiVerifyOtp(email, finalOtp);
+      toast.success("Your email is verified with Mercato!!");
+      setStep("signup");
     } catch {
-      toast.error("OTP verification failed");
+      toast.error("Invalid OTP");
     } finally {
       setLoading(false);
     }

@@ -31,4 +31,6 @@ public interface UserRepo extends JpaRepository<User,Long> {
     void deleteExpiredSellers(@Param("status") SellerDetails.Status status,@Param("date") LocalDateTime date);
 
     boolean existsByEmail(String email);
+
+    long countByRole(User.UserRole role);
 }

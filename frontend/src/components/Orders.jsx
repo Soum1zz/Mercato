@@ -3,6 +3,7 @@ import OrderSub from "../components/OrderSub";
 import { getToken } from "../auth/authService";
 import "../styles/order.css";
 import { useNavigate } from "react-router-dom";
+import { getUserOrders } from "../api/orderApi";
 export default function Orders() {
   const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
@@ -13,24 +14,12 @@ export default function Orders() {
         navigate("/auth");
         return;
       }
-      // setLoading(true);
       try {
-        const res = await fetch("http://localhost:8080/api/me/orders", {
-          headers: {
-            Authorization: `Bearer ${getToken()}`,
-          },
-        });
-
-        if (!res.ok) {
-          throw new Error("Failed to fetch user cart");
-        }
-        const data = await res.json();
-        setOrders(data);
+        const res = await getUserOrders();
+        setOrders(res.data);
       } catch (e) {
         console.error(e);
         setOrders(null);
-      } finally {
-        //   setLoading(false);
       }
     };
     fetchWish();

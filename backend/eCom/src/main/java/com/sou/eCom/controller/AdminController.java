@@ -1,5 +1,6 @@
 package com.sou.eCom.controller;
 
+import com.sou.eCom.model.dto.AdminStatsResponse;
 import com.sou.eCom.model.dto.UserResponse;
 import com.sou.eCom.service.AdminService;
 import com.sou.eCom.service.SellerService;
@@ -23,6 +24,12 @@ public class AdminController {
     UserService userService;
     @Autowired
     SellerService sellerService;
+
+    @GetMapping("/stats")
+    public ResponseEntity<AdminStatsResponse> getStats() {
+        return ResponseEntity.ok(adminService.getAdminStats());
+    }
+
     @PutMapping("/sellers/{id}/approve")
     public ResponseEntity<?> approveSeller(@PathVariable("id") long id){
         try{

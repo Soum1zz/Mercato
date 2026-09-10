@@ -4,6 +4,7 @@ import { IoReturnUpBack } from "react-icons/io5";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import "../styles/auth.css";
+import { resetPassword } from "../api/authApi";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
@@ -85,33 +86,20 @@ export default function ResetPassword() {
     setLoading(true);
 
     try {
-      const res = await fetch(
-        "http://localhost:8080/api/reset-password",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            pwd: passwordData.password,
-            token: token
-          }),
-        }
-      );
+      await resetPassword({
+        pwd: passwordData.password,
+        token: token,
+      });
 
-      if (res.ok) {
-        toast.success("Password reset successful!");
-        localStorage.removeItem("email");
-        navigate("/auth");
-      } else {
-        const text = await res.text();
-        toast.error(text);
-      }
+      toast.success("Password reset successful!");
+      localStorage.removeItem("email");
+      navigate("/auth");
     } catch (e) {
-      toast.error("Network error", e);
+      const text = e.response?.data;
+      toast.error(text || "Password reset failed");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (

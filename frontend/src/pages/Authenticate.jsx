@@ -8,6 +8,13 @@ import { saveToken } from "../auth/authService";
 import { jwtDecode } from "jwt-decode";
 import toast from "react-hot-toast";
 import OtpInput from "../components/otpInput";
+import {
+  checkValidEmail,
+  requestOtp as apiAuthRequestOtp,
+  requestResetLink as apiAuthRequestResetLink,
+  registerUser,
+  loginUser,
+} from "../api/authApi";
 export default function Authenticate() {
   // const [loginForm, setLoginForm] = useState(null);
   // const [signupForm, setSignUpForm] = useState(null);
@@ -63,13 +70,8 @@ export default function Authenticate() {
     setLoading(true);
     localStorage.setItem("email", email);
     try {
-      const res = await fetch(
-        `http://localhost:8080/api/valid-email?email=${encodeURIComponent(email)}`,
-        {
-          method: "GET",
-        },
-      );
-      if (res.status == 200) {
+      const res = await checkValidEmail(email);
+      if (res.status === 200) {
         toast.error("email already exists");
         navigate("/auth");
         setLoading(false);
@@ -80,22 +82,9 @@ export default function Authenticate() {
       console.log(e);
     }
     try {
-      const resp = await fetch("http://localhost:8080/api/request-otp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-        }),
-      });
-
-      if (resp.status === 200) {
-        toast.success("OTP generated please check your email!!");
-        setStep("otp");
-      } else {
-        toast.error("OTP can't be generated at this moment!!");
-      }
+      await apiAuthRequestOtp(email);
+      toast.success("OTP generated please check your email!!");
+      setStep("otp");
     } catch {
       toast.error("OTP can't be generated at this moment!!");
     } finally {
@@ -107,15 +96,9 @@ export default function Authenticate() {
     setLoading(true);
     localStorage.setItem("email", email);
     try {
-      const res = await fetch(
-        `http://localhost:8080/api/valid-email?email=${encodeURIComponent(email)}`,
-        {
-          method: "GET",
-        },
-      );
+      const res = await checkValidEmail(email);
       if (res.status !== 200) {
-        const message = await res.text();
-        toast.error(message || "Email not found");
+        toast.error("Email not found");
         navigate("/auth");
         setLoading(false);
         setStep("login");
@@ -123,24 +106,18 @@ export default function Authenticate() {
       }
     } catch (e) {
       console.log(e);
+      toast.error(e.response?.data || "Email not found");
+      navigate("/auth");
+      setLoading(false);
+      setStep("login");
+      return;
     }
     try {
-      const resp = await fetch("http://localhost:8080/api/link-req", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: email }),
-      });
-
-      if (resp.status === 200) {
-        toast.success("Link sent please check your email!!");
-      } else {
-        const message = await resp.text();
-        toast.error(message || "Link can't be sent at this moment!!");
-      }
-    } catch {
-      toast.error("Link can't be sent at this moment!!");
+      await apiAuthRequestResetLink(email);
+      toast.success("Link sent please check your email!!");
+    } catch (err) {
+      const message = err.response?.data;
+      toast.error(message || "Link can't be sent at this moment!!");
     } finally {
       setLoading(false);
     }
@@ -174,24 +151,9 @@ export default function Authenticate() {
             };
 
             try {
-              const response = await fetch(
-                "http://localhost:8080/auth/register",
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify(payLoad),
-                },
-              );
-              if (response.ok) {
-                toast.success("You have successfully signed up to Mercato");
-                setStep("login");
-              } else {
-                if (response?.status === 409)
-                  toast.error("Email already exists!");
-                else toast.error("Sign up failed");
-              }
+              await registerUser(payLoad);
+              toast.success("You have successfully signed up to Mercato");
+              setStep("login");
             } catch (e) {
               if (e.response?.status === 409)
                 toast.error("Email already exists!");
@@ -207,40 +169,27 @@ export default function Authenticate() {
             };
 
             try {
-              const response = await fetch("http://localhost:8080/auth/login", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(payLoad),
-              });
-              if (response.ok) {
-                const result = await response.json();
-                toast.success("You have successfully logged in to Mercato");
-                saveToken(result.token);
-                const decoded = jwtDecode(result.token);
-                const role = decoded.role;
-                console.log(role);
-                if (role === "ADMIN") {
-                  navigate("/admin");
-                } else if (role === "SELLER") {
-                  navigate("/seller");
-                } else {
-                  navigate("/customer");
-                }
+              const response = await loginUser(payLoad);
+              const result = response.data;
+              toast.success("You have successfully logged in to Mercato");
+              saveToken(result.token);
+              const decoded = jwtDecode(result.token);
+              const role = decoded.role;
+              console.log(role);
+              if (role === "ADMIN") {
+                navigate("/admin");
+              } else if (role === "SELLER") {
+                navigate("/seller");
               } else {
-                const errorText = await response.text();
-                console.error(
-                  "Server Error Status:",
-                  response.status,
-                  "Message:",
-                  errorText,
-                );
-                toast.error("Log in failed");
+                navigate("/customer");
               }
             } catch (e) {
-              console.log("Network Error: ", e);
-              toast.error("Log in failed");
+              console.log("Error: ", e);
+              if (e.response?.status === 401 || e.response?.status === 400) {
+                toast.error("Invalid credentials, try again!");
+              } else {
+                toast.error("Log in failed");
+              }
             } finally {
               setLoading(false);
             }

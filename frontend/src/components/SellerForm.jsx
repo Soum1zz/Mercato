@@ -1,5 +1,7 @@
-import { useEffect, } from "react";
-import { getToken } from "../auth/authService";
+import { useEffect } from "react";
+import { submitSellerDetails } from "../api/sellerApi";
+import { uploadToCloudinary } from "../api/uploadApi";
+
 export default function SellerForm({ sellDet, onClose, user }) {
   
   useEffect(() => {
@@ -19,28 +21,14 @@ export default function SellerForm({ sellDet, onClose, user }) {
         <form
           onSubmit={async (e) => {
             e.preventDefault();
-            let imgUrl=null;
+            let imgUrl = null;
             const form = e.currentTarget;
             const rawFormData = new FormData(form);
             const file = rawFormData.get("cert");
             if (!file) return;
-            const data = new FormData();
-            data.append("file", file);
-            data.append("upload_preset", "Mercato");
-            data.append("cloud_name", "dp5zhfxsl");
 
             try {
-              const res = await fetch(
-                "https://api.cloudinary.com/v1_1/dp5zhfxsl/image/upload",
-                {
-                  method: "POST",
-                  body: data,
-                },
-              );
-
-              const jsonData = await res.json();
-              imgUrl= jsonData.secure_url;
-
+              imgUrl = await uploadToCloudinary(file);
             } catch (e) {
               console.error("Image upload failed", e);
             }
@@ -48,28 +36,15 @@ export default function SellerForm({ sellDet, onClose, user }) {
             const userData = {
               taxId: rawFormData.get("taxId"),
               description: rawFormData.get("desc"),
-              imgUrl: imgUrl
+              imgUrl: imgUrl,
             };
 
             try {
-              const response = await fetch(
-                `http://localhost:8080/seller/${user.userId}/details`,
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type":"application/json",
-                    Authorization: `Bearer ${getToken()}`,
-                  },
-                  body: JSON.stringify(userData),
-                },
-              );
-              if (response.ok) {
-                alert("sucessfully updated");
-              } else {
-                alert(response.status);
-              }
+              await submitSellerDetails(user.userId, userData);
+              alert("sucessfully updated");
             } catch (e) {
               console.log(e);
+              alert(e.response?.status || "Update failed");
             }
           }}
         >

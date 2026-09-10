@@ -3,6 +3,7 @@ import { getToken } from "../auth/authService";
 import ProductCard from "./ProductCard";
 import { useNavigate } from "react-router-dom";
 import "../styles/products.css";
+import { getCustomerWishlist } from "../api/customerApi";
 export default function Wishlist() {
   const [wishlist, setWishlist] = useState([]);
   const navigate= useNavigate();
@@ -17,27 +18,15 @@ export default function Wishlist() {
         }
         // setLoading(true);
         try {
-          const res = await fetch("http://localhost:8080/api/me/wishlist", {
-            headers: {
-              Authorization: `Bearer ${getToken()}`,
-            },
-          });
-  
-          if (res.status === 400) {
+          const res = await getCustomerWishlist();
+          setWishlist(res.data);
+        } catch (e) {
+          if (e.response?.status === 400) {
             setWishlist([]);
             return;
           }
-
-          if (!res.ok) {
-            throw new Error("Failed to fetch user wishlist");
-          }
-          const data = await res.json();
-          setWishlist(data);
-        } catch (e) {
           console.error(e);
           setWishlist([]);
-        } finally {
-        //   setLoading(false);
         }
       };
       fetchWish()
