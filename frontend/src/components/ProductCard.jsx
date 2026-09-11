@@ -5,7 +5,7 @@ export default function ProductCard({ product }) {
     const name= product.name.length>30?(product.name.substring(0,30)+"..."):product.name;
 
     if (!product) return null;
-    const imageUrl = `http://localhost:8080/api/product/${product.id}/image`; return (
+    const imageUrl = `/api/product/${product.id}/image`; return (
         <div className='prod-card'>
             <img src={imageUrl} width={120} />
             <div className='text-field'>
