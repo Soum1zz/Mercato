@@ -1,4 +1,4 @@
-export { default as axiosClient } from "./axiosClient";
+export { default as axiosClient, API_BASE_URL } from "./axiosClient";
 export * from "./authApi";
 export * from "./productApi";
 export * from "./cartApi";

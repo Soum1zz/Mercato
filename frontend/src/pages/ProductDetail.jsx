@@ -17,6 +17,7 @@ import {
   getUserCommentOnProduct,
   checkWishlistStatus,
   toggleWishlist,
+  getProductImageUrl,
 } from "../api/productApi";
 import { updateCart } from "../api/cartApi";
 import { createOrder } from "../api/orderApi";
@@ -202,7 +203,7 @@ export default function ProductDetail() {
             toast.error("Failed to order");
         }
     };
-    const imageUrl = `http://localhost:8080/api/product/${id}/image`
+    const imageUrl = getProductImageUrl(id);
     if (!product) return <Loader/>
 
     if (edit) {

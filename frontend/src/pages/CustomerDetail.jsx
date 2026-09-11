@@ -9,16 +9,14 @@ import CustomerForm from "../components/CustomerForm";
 import Orders from "../components/Orders";
 import { getToken, isTokenExpired, logout, fetchUserProfile } from "../auth/authService";
 import { useNavigate } from "react-router-dom";
-import { updateCustomerImage } from "../api/customerApi";
+import { updateCustomerImage, getUserImageUrl } from "../api/customerApi";
 import { uploadToCloudinary } from "../api/uploadApi";
 export default function CustomerDetail() {
   const [content, setContent] = useState("CustomerForm");
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const [isForm, setForm] = useState(false);
-  const imgUrl = user
-    ? `http://localhost:8080/api/user/${user.userId}/image`
-    : null;
+  const imgUrl = user ? getUserImageUrl(user.userId) : null;
   const [preview, setPreview] = useState(null);
 
   const fileInputRef = useRef(null);
@@ -57,7 +55,7 @@ export default function CustomerDetail() {
         const data = await fetchUserProfile();
         if (data) {
           setUser(data);
-          setPreview(`http://localhost:8080/api/user/${data.userId}/image`);
+          setPreview(getUserImageUrl(data.userId));
         }
       } catch (e) {
         console.error("Failed to fetch user", e);

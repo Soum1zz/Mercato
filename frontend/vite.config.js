@@ -7,5 +7,12 @@ export default defineConfig({
     react(),
   ],
   base: '/',
-
+  server: {
+    proxy: {
+      '/api': 'http://localhost:8080',
+      '/auth': 'http://localhost:8080',
+      '/seller': 'http://localhost:8080',
+      '/admin': 'http://localhost:8080',
+    },
+  },
 })

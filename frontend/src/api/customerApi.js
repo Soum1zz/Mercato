@@ -1,4 +1,7 @@
-import axiosClient from "./axiosClient";
+import axiosClient, { API_BASE_URL } from "./axiosClient";
+
+export const getUserImageUrl = (userId) =>
+  userId ? `${API_BASE_URL}/api/user/${userId}/image` : "";
 
 export const updateCustomerProfile = (data) =>
   axiosClient.put("/api/me", data);

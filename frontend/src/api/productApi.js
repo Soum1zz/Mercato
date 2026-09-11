@@ -1,4 +1,7 @@
-import axiosClient from "./axiosClient";
+import axiosClient, { API_BASE_URL } from "./axiosClient";
+
+export const getProductImageUrl = (productId) =>
+  productId ? `${API_BASE_URL}/api/product/${productId}/image` : "";
 
 export const getProducts = () =>
   axiosClient.get("/api/product");

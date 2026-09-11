@@ -1,11 +1,14 @@
 import '../styles/productCard.css'
 import { useNavigate } from "react-router-dom"
+import { getProductImageUrl } from "../api/productApi"
+
 export default function ProductCard({ product }) {
     const navigate = useNavigate();
     const name= product.name.length>30?(product.name.substring(0,30)+"..."):product.name;
 
     if (!product) return null;
-    const imageUrl = `/api/product/${product.id}/image`; return (
+    const imageUrl = getProductImageUrl(product.id);
+    return (
         <div className='prod-card'>
             <img src={imageUrl} width={120} />
             <div className='text-field'>

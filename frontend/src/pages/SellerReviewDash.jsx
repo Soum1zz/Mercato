@@ -3,6 +3,7 @@ import '../styles/sellerReqDash.css'
 import { useEffect, useState } from 'react';
 import { getToken, isTokenExpired } from '../auth/authService';
 import { approveSeller, getSellerCertificate } from '../api/adminApi';
+import { getUserImageUrl } from '../api/customerApi';
 
 export default function SellerReviewDash() {
   const { state } = useLocation();
@@ -19,7 +20,7 @@ export default function SellerReviewDash() {
     }
     
   }
-  const imgUrl = sellerReq ? `http://localhost:8080/api/user/${sellerReq.userId}/image` : null;
+  const imgUrl = sellerReq ? getUserImageUrl(sellerReq.userId) : null;
   useEffect(()=>{
     const token=getToken();
     if(!token|| isTokenExpired(token)){

@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { getSellerProducts, updateSellerProduct } from "../api/sellerApi";
 import { uploadToCloudinary } from "../api/uploadApi";
+import { getProductImageUrl } from "../api/productApi";
 export default function SellerDash() {
     const [user, setUser] = useState(null);
     const [sellDet, setSell] = useState(null);
@@ -238,7 +239,7 @@ export default function SellerDash() {
                             {sortedProducts.map((product) => (
                                 <div className="seller-product-card" key={product.id}>
                                     <img
-                                        src={`http://localhost:8080/api/product/${product.id}/image`}
+                                        src={getProductImageUrl(product.id)}
                                         alt={product.name}
                                     />
                                     <div className="seller-product-info">

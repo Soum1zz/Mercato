@@ -6,8 +6,13 @@ const getAuthToken = () => {
   return token;
 };
 
+const envBaseUrl = import.meta.env.VITE_API_BASE_URL;
+export const API_BASE_URL = envBaseUrl
+  ? envBaseUrl.replace(/\/+$/, '')
+  : (import.meta.env.DEV ? 'http://localhost:8080' : '');
+
 const axiosClient = axios.create({
-  baseUāRL: import.meta.env.VITE_API_BASE_URL || '',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },

@@ -2,9 +2,10 @@
 import toast from "react-hot-toast";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { deleteCartItem } from "../api/cartApi";
+import { getProductImageUrl } from "../api/productApi";
 
 export default function CartItem({ cartItem, setCart }) {
-    const imageUrl = `http://localhost:8080/api/product/${cartItem.productId}/image`
+    const imageUrl = getProductImageUrl(cartItem.productId);
 
     const deleteCartHandler = async () => {
         try {

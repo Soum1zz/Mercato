@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { IoStar } from "react-icons/io5";
-
+import { getUserImageUrl } from "../api/customerApi";
 
 export default function CommentBody({ comment }) {
   const name= comment.userName?.charAt(0).toUpperCase()||"";
 
   const [imgError, setImgError]= useState(false);
-  const cusImg= `http://localhost:8080/api/user/${comment.userId}/image`;
+  const cusImg = getUserImageUrl(comment.userId);
   return (
     <div className="comments-div">
       <div style={{display:"flex", gap:"2rem", alignItems:"center"}}>
