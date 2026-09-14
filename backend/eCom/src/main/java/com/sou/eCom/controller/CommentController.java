@@ -31,14 +31,14 @@ public class CommentController {
 
     @GetMapping("/product/{productId}/user/comment")
     public ResponseEntity<?> getComments(@PathVariable Long productId, @AuthenticationPrincipal UserPrincipal userPrincipal)  {
-
+        if (userPrincipal == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         try{
             return new ResponseEntity<>(commentService.getUserCommentOnProduct( userPrincipal.getUser().getUserId(), productId),HttpStatus.OK);
         }catch (Exception e){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-
     }
     @GetMapping("/comments/{commentId}")
     public CommentResponse getComment(@PathVariable Long commentId) throws IOException {
@@ -58,27 +58,43 @@ public class CommentController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR) ;
         }
     }
-    @PreAuthorize("hasRole('USER')")
+
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'SELLER', 'ADMIN')")
     @PostMapping("/product/{productId}/comments")
-    public ResponseEntity<CommentResponse> save(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable long productId , @RequestBody CommentRequest commentRequest ) {
+    public ResponseEntity<?> save(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable long productId , @RequestBody CommentRequest commentRequest ) {
         try {
             return new ResponseEntity<>(commentService.addComment(userPrincipal.getUser().getUserId(),productId, commentRequest), HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
-    @PreAuthorize("hasRole('USER')")
-    @PutMapping("/comment/{commentId}")
-    public ResponseEntity<CommentResponse> update(@PathVariable long commentId ,@RequestBody CommentRequest commentRequest ) {
-        try {
-            return new ResponseEntity<>(commentService.updateComment(commentId, commentRequest), HttpStatus.CREATED);
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'SELLER', 'ADMIN')")
+    @PutMapping("/comment/{commentId}")
+    public ResponseEntity<?> update(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable long commentId ,@RequestBody CommentRequest commentRequest ) {
+        try {
+            return new ResponseEntity<>(commentService.updateComment(userPrincipal.getUser().getUserId(), commentId, commentRequest), HttpStatus.OK);
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'SELLER', 'ADMIN')")
     @DeleteMapping("/comment/{commentId}")
-    public void  delete(@PathVariable long commentId) {
-        commentService.deleteComment(commentId);
+    public ResponseEntity<?> delete(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable long commentId) {
+        try {
+            boolean isAdmin = userPrincipal.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+            commentService.deleteComment(userPrincipal.getUser().getUserId(), commentId, isAdmin);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 }

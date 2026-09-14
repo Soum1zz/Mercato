@@ -1,9 +1,17 @@
-import { Navigate } from "react-router-dom";
-import { isAuthenticated } from "./authService";
+import { isAuthenticated, getCurrentUser } from "./authService";
+import NotFound from "../pages/NotFound";
 
-export default function ProtectedRoute({children}){
-     if(!isAuthenticated()){
-        return <Navigate to="/auth" replace/>
-     }
-     return children;
+export default function ProtectedRoute({ children, allowedRoles }) {
+  if (!isAuthenticated()) {
+    return <NotFound type="unauthorized" />;
+  }
+
+  if (allowedRoles && allowedRoles.length > 0) {
+    const user = getCurrentUser();
+    if (!user || !allowedRoles.includes(user.role)) {
+      return <NotFound type="unauthorized" />;
+    }
+  }
+
+  return children;
 }

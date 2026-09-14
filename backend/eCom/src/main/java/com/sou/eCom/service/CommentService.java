@@ -28,31 +28,34 @@ public class CommentService {
     private ProductRepo productRepo;
 
     public CommentResponse addComment(long uId ,long productId, CommentRequest commentRequest) throws IOException {
+        if (commentRepo.findByUserUserIdAndProductId(uId, productId).isPresent()) {
+            throw new IllegalStateException("User has already reviewed this product");
+        }
+
         Comment comment = new Comment();
         Product product = productRepo.findById(productId).orElseThrow(()->new RuntimeException("product not found"));
         User user =userRepo.findByUserId(uId).orElseThrow(()->new RuntimeException("user not found"));
 
-
-
-            comment.setProduct(product);
-            comment.setUser(user);
-            comment.setCommentBody(commentRequest.desc());
-            comment.setRating(commentRequest.rating());
-            comment.setCreatedDate(LocalDate.now());
+        comment.setProduct(product);
+        comment.setUser(user);
+        comment.setCommentBody(commentRequest.desc());
+        comment.setRating(commentRequest.rating());
+        comment.setCreatedDate(LocalDate.now());
         if(commentRequest.imgUrl() != null && !commentRequest.imgUrl().isEmpty())
         {
             comment.setImageUrl(commentRequest.imgUrl());
         }
         commentRepo.save(comment);
         return toCommentResponse(comment);
-
-
     }
 
-    public CommentResponse updateComment(long commentId, CommentRequest commentRequest) throws IOException {
-            Comment oldComment= commentRepo.findById(commentId).orElseThrow(()->new RuntimeException("comment not found"));
-            oldComment.setRating(commentRequest.rating());
-            oldComment.setCommentBody(commentRequest.desc());
+    public CommentResponse updateComment(long uId, long commentId, CommentRequest commentRequest) throws IOException {
+        Comment oldComment = commentRepo.findById(commentId).orElseThrow(()->new RuntimeException("comment not found"));
+        if (oldComment.getUser().getUserId() != uId) {
+            throw new SecurityException("Unauthorized to edit this review");
+        }
+        oldComment.setRating(commentRequest.rating());
+        oldComment.setCommentBody(commentRequest.desc());
         if(commentRequest.imgUrl() != null && !commentRequest.imgUrl().isEmpty())
         {
             oldComment.setImageUrl(commentRequest.imgUrl());
@@ -88,9 +91,11 @@ public class CommentService {
         return commentResponses;
     }
 
-    public void deleteComment(long commentId) {
-        Comment com=commentRepo.findById(commentId).orElseThrow(()->new RuntimeException("comment not found"));
-
+    public void deleteComment(long uId, long commentId, boolean isAdmin) {
+        Comment com = commentRepo.findById(commentId).orElseThrow(()->new RuntimeException("comment not found"));
+        if (!isAdmin && com.getUser().getUserId() != uId) {
+            throw new SecurityException("Unauthorized to delete this review");
+        }
         commentRepo.deleteById(commentId);
     }
 

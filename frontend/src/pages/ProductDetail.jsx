@@ -14,6 +14,7 @@ import {
   getProductRating,
   getProductComments,
   addProductComment,
+  updateProductComment,
   getUserCommentOnProduct,
   checkWishlistStatus,
   toggleWishlist,
@@ -44,23 +45,25 @@ export default function ProductDetail() {
         "Beauty & Personal Care", "Books"
     ];
     useEffect(()=>{
-        const fetchOwnComment= async ()=>{
-            if(!getCurrentUser())return;
+        const fetchOwnComment = async () => {
+            if (!getCurrentUser()) return;
             try {
                 const res = await getUserCommentOnProduct(id);
                 const comData = res.data;
                 setYourCommentData(comData);
-                setYourReview(comData.desc);
-                setYourRating(comData.rating);
-                setImgPreview(comData.imgUrl);
+                setYourReview(comData.desc || "");
+                setYourRating(comData.rating || 0);
+                setImgPreview(comData.imageUrl || comData.imgUrl || null);
             } catch (err) {
-                if (err.response?.status === 404) return; // user never reviewed
-                console.error(err.response?.status);
-                toast.error("Cant fetch your comment");
+                if (err.response?.status === 404) {
+                    setYourCommentData(null);
+                    return; // user never reviewed
+                }
+                console.error(err);
             }
-        }
+        };
         fetchOwnComment();
-    },[id])
+    }, [id]);
     useEffect(() => {
         const fetchProduct = async () => {
             try {
@@ -118,6 +121,36 @@ export default function ProductDetail() {
         }
     };
     
+    const openReviewModal = () => {
+        if (!getCurrentUser()) {
+            navigate("/auth");
+            return;
+        }
+        if (yourCommentData) {
+            setYourReview(yourCommentData.desc || "");
+            setYourRating(yourCommentData.rating || 0);
+            setImgPreview(yourCommentData.imageUrl || yourCommentData.imgUrl || null);
+        } else {
+            setYourReview("");
+            setYourRating(0);
+            setImgPreview(null);
+        }
+        setShowReviewBox(true);
+    };
+
+    const cancelReviewModal = () => {
+        if (yourCommentData) {
+            setYourReview(yourCommentData.desc || "");
+            setYourRating(yourCommentData.rating || 0);
+            setImgPreview(yourCommentData.imageUrl || yourCommentData.imgUrl || null);
+        } else {
+            setYourReview("");
+            setYourRating(0);
+            setImgPreview(null);
+        }
+        setShowReviewBox(false);
+    };
+
     const submitHandler = async (e) => {
         e.preventDefault();
         const form = e.currentTarget;
@@ -126,26 +159,36 @@ export default function ProductDetail() {
             navigate("/auth");
             return;
         }
-        const CommentData = {
-            desc: rawFormData.get("desc"),
+        const commentData = {
+            desc: rawFormData.get("desc") || yourReview,
             rating: yourRating,
             imgUrl: imgPreview,
         };
         try {
-            const response = await addProductComment(product.id, CommentData);
-            console.log("Success:", response.data);
-            toast.success("Comment added!");
+            if (yourCommentData) {
+                const commentId = yourCommentData.commentId || yourCommentData.id;
+                const response = await updateProductComment(commentId, commentData);
+                toast.success("Review updated!");
+                setYourCommentData(response.data);
+            } else {
+                const response = await addProductComment(product.id, commentData);
+                toast.success("Review added!");
+                setYourCommentData(response.data);
+            }
             setShowReviewBox(false);
-            setYourRating(0);
-            setYourReview("");
+
             const ratRes = await getProductRating(product.id);
             setRating(ratRes.data);
 
             const comRes = await getProductComments(product.id);
             setcomments(comRes.data);
         } catch (e) {
-            console.error("Network Error:", e);
-            toast.error("Comment not added!");
+            console.error("Comment submit error:", e);
+            if (e.response?.status === 409) {
+                toast.error("You have already reviewed this product!");
+            } else {
+                toast.error(yourCommentData ? "Failed to update review" : "Comment not added!");
+            }
         }
     };
 
@@ -316,67 +359,93 @@ export default function ProductDetail() {
             </div>
 
 
-            <div>
-                <h2>Your Review:</h2>
-                {
-                   !showReviewBox&&yourCommentData&&
-                    <CommentBody comment={yourCommentData}/>
-                }
-                <button className="comment-btn"
-                onClick={()=>{
-                    if(!getCurrentUser()) {navigate("/auth"); return;}
-                    setShowReviewBox(true)}}
-                >{
-                    yourCommentData==null?
-                    ("Write a review"):("Edit your review")}</button>
+            <div className="your-review-section">
+                <div className="section-title-wrap">
+                    <h2 className="reviews-heading">Your Review</h2>
+                    {yourCommentData && (
+                        <span className="reviews-count-tag">1 submission</span>
+                    )}
+                </div>
 
-                {
-                    showReviewBox&&(
-                        <form className="review-modal"
-                        onSubmit={submitHandler}>
-                            <h3>Your review:</h3>
+                {!showReviewBox && yourCommentData && (
+                    <CommentBody
+                        comment={yourCommentData}
+                        isOwnReview={true}
+                        onEdit={openReviewModal}
+                    />
+                )}
 
+                {!showReviewBox && !yourCommentData && (
+                    <div className="no-user-review-box">
+                        <p>You haven't reviewed this product yet. Share your experience with other shoppers!</p>
+                        <button className="comment-btn" onClick={openReviewModal}>
+                            Write a Review
+                        </button>
+                    </div>
+                )}
+
+                {showReviewBox && (
+                    <form className="review-modal" onSubmit={submitHandler}>
+                        <div className="review-modal-header">
+                            <h3>{yourCommentData ? "Edit Your Review" : "Write a Review"}</h3>
+                            <p className="review-modal-sub">Tell us what you think about this product</p>
+                        </div>
+
+                        <div className="review-field-group">
+                            <label className="review-field-label">Your Rating</label>
                             <div className="star-select">
-                                {
-                                    [1,2,3,4,5].map(n=>(
-                                        <IoStar
+                                {[1, 2, 3, 4, 5].map((n) => (
+                                    <IoStar
                                         key={n}
-                                        className={n<=yourRating?"active-star":""}
-                                        onClick={()=>setYourRating(n)}
-                                        />
-                                    ))
-                                }
+                                        className={n <= yourRating ? "active-star" : ""}
+                                        onClick={() => setYourRating(n)}
+                                    />
+                                ))}
+                                <span className="star-hint-text">
+                                    {yourRating > 0 ? `${yourRating} of 5 stars` : "Select a rating"}
+                                </span>
                             </div>
+                        </div>
 
-                            {
-                            imgPreview?
-                            (<img src={imgPreview}></img>):
-                            (<label 
-                            className="upload-img-div"
-                            >
-                                upload image <FiUpload/>
-                                <input type="file" hidden onChange={imgUploadHandler}/>
-                            </label>)}<br/>
+                        <div className="review-field-group">
+                            <label className="review-field-label">Review Attachment (Optional)</label>
+                            {imgPreview ? (
+                                <div className="review-img-preview-row">
+                                    <img src={imgPreview} alt="Review attachment" className="review-img-preview" />
+                                    <button type="button" onClick={() => setImgPreview(null)} className="review-remove-img-btn">
+                                        Remove Photo
+                                    </button>
+                                </div>
+                            ) : (
+                                <label className="upload-img-div">
+                                    <FiUpload /> Upload photo
+                                    <input type="file" hidden accept="image/*" onChange={imgUploadHandler} />
+                                </label>
+                            )}
+                        </div>
+
+                        <div className="review-field-group">
+                            <label className="review-field-label">Your Review</label>
                             <textarea
-                            style={{width:"400px", padding:"1rem"}}
-                            placeholder="Share your experience..."
-                            value={yourReview}
-                            name="desc"
-                            onChange={(e)=>setYourReview(e.target.value)}
+                                className="review-textarea"
+                                placeholder="What did you like or dislike? How did it fit or perform?"
+                                value={yourReview}
+                                name="desc"
+                                rows={4}
+                                onChange={(e) => setYourReview(e.target.value)}
                             />
+                        </div>
 
-                            <div className="review-actions">
-                                <button type="submit"
-                                >Submit</button>
-                                <button type="button"
-                                onClick={()=>setShowReviewBox(false)}
-                                >Cancel</button>
-
-                            </div>
-                        </form>
-                    )
-                }
-                
+                        <div className="review-actions">
+                            <button type="submit" className="review-submit-btn">
+                                {yourCommentData ? "Update Review" : "Submit Review"}
+                            </button>
+                            <button type="button" className="review-cancel-btn" onClick={cancelReviewModal}>
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                )}
             </div>
         </div>
 
@@ -434,20 +503,37 @@ export default function ProductDetail() {
             </div>
 
 
-            <div>
-                <h2>Customer Reviews:</h2>
+            <div className="customer-reviews-section">
+                <div className="section-title-wrap">
+                    <h2 className="reviews-heading">Customer Reviews</h2>
+                    {rating?.totalRatings != null && (
+                        <span className="reviews-count-tag">
+                            {rating.totalRatings} {rating.totalRatings === 1 ? "Review" : "Reviews"}
+                        </span>
+                    )}
+                </div>
 
-                
-                {
-                    Comments.length==0?
-                    (<div>No Comments yet</div>):
-                    (<div>
-                        {
-                          Comments.map((comment)=>(
-                         <CommentBody key={comment.id} comment={comment}/>))
-                        }
-                    </div>)
-                }
+                {(() => {
+                    const otherReviews = Comments.filter((c) => {
+                        const commentId = c.commentId || c.id;
+                        const yourId = yourCommentData?.commentId || yourCommentData?.id;
+                        if (yourId && commentId === yourId) return false;
+                        if (yourCommentData?.userId && c.userId === yourCommentData.userId) return false;
+                        return true;
+                    });
+
+                    return otherReviews.length === 0 ? (
+                        <div className="no-reviews-box">
+                            <p>No other customer reviews yet for this product.</p>
+                        </div>
+                    ) : (
+                        <div className="reviews-list-container">
+                            {otherReviews.map((comment) => (
+                                <CommentBody key={comment.commentId || comment.id} comment={comment} />
+                            ))}
+                        </div>
+                    );
+                })()}
 
             </div>
         </div>

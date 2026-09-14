@@ -18,8 +18,8 @@ export const getProductComments = (id) =>
 export const addProductComment = (id, commentData) =>
   axiosClient.post(`/api/product/${id}/comments`, commentData);
 
-export const updateProductComment = (id, commentData) =>
-  axiosClient.put(`/api/product/${id}`, commentData);
+export const updateProductComment = (commentId, commentData) =>
+  axiosClient.put(`/api/comment/${commentId}`, commentData);
 
 export const getUserCommentOnProduct = (id) =>
   axiosClient.get(`/api/product/${id}/user/comment`);

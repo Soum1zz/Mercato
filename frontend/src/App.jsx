@@ -15,6 +15,7 @@ import SellerDash from './pages/SellerDash'
 import ProtectedRoute from './auth/ProtectedRoute'
 import OrderDetail from './pages/OrderDetail'
 import ResetPassword from './pages/ResetPassword'
+import NotFound from './pages/NotFound'
 import { Toaster } from 'react-hot-toast'
 function App() {
   const [theme, setTheme]=  useState ("light");
@@ -38,18 +39,17 @@ function App() {
           contactRef={contactRef}/>} />
           <Route path='/cart' element={<Cart />} />
           <Route path='/auth' element={<Authenticate />} />
-          <Route path='/productForm' element={<ProductForm />} />
           <Route path='/products' element={<Products />} />
           <Route path='/product/:id' element={<ProductDetail />} />
-          <Route path='/auth' element={<Authenticate />} />
-          <Route path='/seller-review' element={<ProtectedRoute><SellerReviewDash /></ProtectedRoute>} />
-          <Route path='/customer' element={<ProtectedRoute><CustomerDetail /></ProtectedRoute> } />
-          <Route path='/admin' element={<ProtectedRoute><AdminDash /></ProtectedRoute> } />
-          <Route path='/seller' element={<ProtectedRoute><SellerDash /></ProtectedRoute> } />
-          <Route path='/add-product' element={<ProtectedRoute><ProductForm/></ProtectedRoute> } />
+          <Route path='/seller-review' element={<ProtectedRoute allowedRoles={['ADMIN']}><SellerReviewDash /></ProtectedRoute>} />
+          <Route path='/customer' element={<ProtectedRoute allowedRoles={['CUSTOMER', 'SELLER', 'ADMIN']}><CustomerDetail /></ProtectedRoute> } />
+          <Route path='/admin' element={<ProtectedRoute allowedRoles={['ADMIN']}><AdminDash /></ProtectedRoute> } />
+          <Route path='/seller' element={<ProtectedRoute allowedRoles={['SELLER']}><SellerDash /></ProtectedRoute> } />
+          <Route path='/add-product' element={<ProtectedRoute allowedRoles={['SELLER']}><ProductForm/></ProtectedRoute> } />
+          <Route path='/productForm' element={<ProtectedRoute allowedRoles={['SELLER']}><ProductForm/></ProtectedRoute> } />
           <Route path='/order-detail/:id' element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
           <Route path='/reset-password' element={<ResetPassword/> } />
-
+          <Route path='*' element={<NotFound />} />
         </Routes>
        
       
