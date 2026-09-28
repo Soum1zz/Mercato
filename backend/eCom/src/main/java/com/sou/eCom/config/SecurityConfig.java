@@ -84,7 +84,9 @@ public class SecurityConfig {
                 "http://localhost:5173",
                 "http://localhost:3000",
                 "http://localhost:4173",
-                "https://soum1zz.github.io"
+                "https://soum1zz.github.io",
+                "https://official-mercato.duckdns.org",
+                "http://official-mercato.duckdns.org"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
