@@ -1,0 +1,104 @@
+name: Deploy Mercato to AWS EC2
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    name: Build & Push to ECR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # ----------------- BACKEND -----------------
+      - name: Build Backend JAR
+        run: |
+          cd backend/eCom
+          chmod +x mvnw
+          ./mvnw clean package -DskipTests
+
+      - name: Build & Push Backend Docker Image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+        run: |
+          cd backend/eCom
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:backend-latest -t $ECR_REGISTRY/$ECR_REPOSITORY:backend-${{ github.sha }} .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:backend-latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:backend-${{ github.sha }}
+
+      # ----------------- FRONTEND -----------------
+      - name: Build & Push Frontend Docker Image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+        run: |
+          cd frontend
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:frontend-latest -t $ECR_REGISTRY/$ECR_REPOSITORY:frontend-${{ github.sha }} .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:frontend-latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:frontend-${{ github.sha }}
+
+  deploy:
+    name: Deploy to EC2
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: SSH to EC2 and Deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Authenticate Docker with ECR
+            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+
+            # Pull latest images
+            docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:backend-latest
+            docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:frontend-latest
+
+            # Deploy Backend
+            docker stop backend || true
+            docker rm backend || true
+            docker run -d \
+              --name backend \
+              --restart unless-stopped \
+              --env-file /home/ubuntu/backend.env \
+              -p 8080:8080 \
+              ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:backend-latest
+
+            # Deploy Frontend
+            docker stop frontend || true
+            docker rm frontend || true
+            docker run -d \
+              --name frontend \
+              --restart unless-stopped \
+              --add-host=host.docker.internal:host-gateway \
+              -p 3000:80 \
+              ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:frontend-latest
+
+            # Clean up old unused images
+            docker image prune -f
